@@ -1,0 +1,23 @@
+{
+  "name": "wp-ai-sdk-demo",
+  "version": "1.0.0",
+  "description": "WP AI SDK Demo plugin",
+  "homepage": "https://github.com/jonathanbossenger/wp-ai-sdk-demo#readme",
+  "bugs": {
+    "url": "https://github.com/jonathanbossenger/wp-ai-sdk-demo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanbossenger/wp-ai-sdk-demo.git"
+  },
+  "license": "GPL-2.0-or-later",
+  "author": "Jonathan Bossenger",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^31.2.0"
+  }
+}

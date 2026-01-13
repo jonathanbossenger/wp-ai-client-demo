@@ -1,0 +1,1 @@
+console.log('WP AI SDK Demo Plugin Loaded');

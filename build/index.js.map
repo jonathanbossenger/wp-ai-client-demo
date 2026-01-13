@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","mappings":";;;;AAAAA,OAAO,CAACC,GAAG,CAAC,8BAA8B,CAAC,C","sources":["webpack://wp-ai-sdk-demo/./src/index.js"],"sourcesContent":["console.log('WP AI SDK Demo Plugin Loaded');"],"names":["console","log"],"ignoreList":[],"sourceRoot":""}
