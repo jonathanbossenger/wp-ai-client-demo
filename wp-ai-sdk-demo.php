@@ -48,13 +48,10 @@ function wp_ai_sdk_demo_register_tools_submenu() {
 }
 
 function wp_ai_sdk_demo_tools_page_callback() {
-    // Simple page output; replace with your React mount node or server-rendered content.
-    ?>
-    <div class="wrap">
-        <h1><?php esc_html_e( 'WP AI SDK Demo', 'wp-ai-sdk-demo' ); ?></h1>
-        <div id="wp-ai-sdk-demo-app">WP AI SDK Demo Content</div>
-    </div>
-    <?php
+    printf(
+        '<div class="wrap" id="wp-ai-sdk-demo-app">%s</div>',
+        esc_html__( 'Loading…', 'wp-ai-sdk-demo' )
+    );
 }
 
 add_action( 'admin_enqueue_scripts', 'wp_ai_sdk_demo_admin_enqueue_scripts' );
