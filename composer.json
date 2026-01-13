@@ -12,10 +12,15 @@
     "minimum-stability": "stable",
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "php-http/discovery": true
         }
     },
     "require-dev": {
         "wp-coding-standards/wpcs": "^3.0"
+    },
+    "require": {
+        "wordpress/wp-ai-client": "^0.2.1",
+        "wordpress/abilities-api": "^0.4.0"
     }
 }
