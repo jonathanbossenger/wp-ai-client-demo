@@ -74914,50 +74914,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/dataviews/wp */ "./node_modules/@wordpress/dataviews/build-wp/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_abilities__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/abilities */ "@wordpress/abilities");
+/* harmony import */ var _wordpress_abilities__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_abilities__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
 
 
 
 
 const SettingsTitle = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
     level: 1,
     children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WP AI SDK Demo', 'wp-ai-sdk-demo')
   });
 };
-const SaveButton = ({
+const GenerateButton = ({
   onClick
 }) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
       variant: "primary",
       onClick: onClick,
       __next40pxDefaultSize: true,
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Save', 'wp-ai-sdk-demo')
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Generate', 'wp-ai-sdk-demo')
     })
   });
 };
 const SettingsPage = () => {
-  const data = {};
-  const fields = [];
-  const form = {};
-  const saveSettings = () => {
-    // Implement save functionality here
+  const [input, setInput, saveInput] = useSettings();
+  const fields = [{
+    id: 'title',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Title', 'wp-ai-sdk-demo'),
+    type: 'text'
+  }, {
+    id: 'prompt',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Prompt', 'wp-ai-sdk-demo'),
+    type: 'text',
+    Edit: 'textarea'
+  }];
+  const form = {
+    fields: ['title', 'prompt']
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
+  const generatePost = () => {
+    const generatePostAbility = (0,_wordpress_abilities__WEBPACK_IMPORTED_MODULE_3__.getAbility)('wp-ai-sdk-demo/generate-post');
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
     spacing: 4,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_2__.DataForm, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_2__.DataForm, {
       data: data,
       fields: fields,
       form: form,
       onChange: () => {}
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(SaveButton, {
-      onClick: saveSettings
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(GenerateButton, {
+      onClick: generatePost
     })]
   });
 };
 
+
+/***/ },
+
+/***/ "@wordpress/abilities"
+/*!***********************************!*\
+  !*** external ["wp","abilities"] ***!
+  \***********************************/
+(module) {
+
+"use strict";
+module.exports = window["wp"]["abilities"];
 
 /***/ },
 

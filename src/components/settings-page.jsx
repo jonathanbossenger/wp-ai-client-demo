@@ -7,6 +7,7 @@ import {
     Button,
 } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews/wp';
+import { getAbility } from '@wordpress/abilities';
 
 const SettingsTitle = () => {
     return (
@@ -16,11 +17,11 @@ const SettingsTitle = () => {
     );
 };
 
-const SaveButton = ( { onClick } ) => {
+const GenerateButton = ( { onClick } ) => {
     return (
         <div>
             <Button variant="primary" onClick={ onClick } __next40pxDefaultSize>
-                { __( 'Save', 'wp-ai-sdk-demo' ) }
+                { __( 'Generate', 'wp-ai-sdk-demo' ) }
             </Button>
         </div>
     );
@@ -28,12 +29,30 @@ const SaveButton = ( { onClick } ) => {
 
 const SettingsPage = () => {
 
-    const data = {};
-    const fields = [];
-    const form = {};
+    const [ input, setInput, saveInput ] = useSettings();
 
-    const saveSettings = () => {
-        // Implement save functionality here
+    const fields = [
+        {
+            id: 'title',
+            label: __( 'Title', 'wp-ai-sdk-demo' ),
+            type: 'text',
+        },
+        {
+            id: 'prompt',
+            label: __( 'Prompt', 'wp-ai-sdk-demo' ),
+            type: 'text',
+            Edit: 'textarea',
+        }
+    ];
+
+    const form = {
+        fields: [ 'title', 'prompt' ],
+    };
+
+
+    const generatePost = () => {
+        const generatePostAbility = getAbility( 'wp-ai-sdk-demo/generate-post' );
+
     }
 
     return (
@@ -46,7 +65,7 @@ const SettingsPage = () => {
                 onChange={() => {
                 }}
             />
-            <SaveButton onClick={saveSettings}/>
+            <GenerateButton onClick={generatePost}/>
         </VStack>
     );
 };
