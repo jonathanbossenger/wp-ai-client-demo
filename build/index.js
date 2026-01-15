@@ -74913,18 +74913,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/dataviews/wp */ "./node_modules/@wordpress/dataviews/build-wp/index.js");
-/* harmony import */ var _wordpress_abilities__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/abilities */ "@wordpress/abilities");
-/* harmony import */ var _wordpress_abilities__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_abilities__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/dataviews/wp */ "./node_modules/@wordpress/dataviews/build-wp/index.js");
+/* harmony import */ var _wordpress_abilities__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/abilities */ "@wordpress/abilities");
+/* harmony import */ var _wordpress_abilities__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_abilities__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
+
 
 
 
 
 
 const SettingsTitle = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
     level: 1,
     children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WP AI SDK Demo', 'wp-ai-sdk-demo')
   });
@@ -74932,8 +74935,8 @@ const SettingsTitle = () => {
 const GenerateButton = ({
   onClick
 }) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("div", {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
       variant: "primary",
       onClick: onClick,
       __next40pxDefaultSize: true,
@@ -74942,7 +74945,10 @@ const GenerateButton = ({
   });
 };
 const SettingsPage = () => {
-  const [input, setInput, saveInput] = useSettings();
+  const [input, setInput] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({
+    title: "",
+    prompt: ""
+  });
   const fields = [{
     id: 'title',
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Title', 'wp-ai-sdk-demo'),
@@ -74956,18 +74962,44 @@ const SettingsPage = () => {
   const form = {
     fields: ['title', 'prompt']
   };
-  const generatePost = () => {
-    const generatePostAbility = (0,_wordpress_abilities__WEBPACK_IMPORTED_MODULE_3__.getAbility)('wp-ai-sdk-demo/generate-post');
+  const updateNotice = message => {
+    const noticeElement = document.getElementById('wp-ai-sdk-demo-notice');
+    noticeElement.innerText = message;
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
+  const onChange = edits => {
+    setInput(current => ({
+      ...current,
+      ...edits
+    }));
+  };
+  const generateFromInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useCallback)(async () => {
+    const ability = (0,_wordpress_abilities__WEBPACK_IMPORTED_MODULE_4__.getAbility)('wp-ai-sdk-demo/generate-post');
+    if (!ability) {
+      updateNotice('Whoops, post generation Ability not found.');
+      return;
+    }
+    try {
+      updateNotice('Attempting to execute post generation Ability, please hold for updates...');
+      const result = await (0,_wordpress_abilities__WEBPACK_IMPORTED_MODULE_4__.executeAbility)('wp-ai-sdk-demo/generate-post', input);
+    } catch (err) {
+      updateNotice('Error during post generation. Check console for details.');
+      console.error(err);
+    } finally {
+      updateNotice('Post generation completed!.');
+    }
+  }, [input]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
     spacing: 4,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_2__.DataForm, {
-      data: data,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("span", {
+      id: "wp-ai-sdk-demo-notice",
+      children: "Ready to generate a post using AI?"
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_3__.DataForm, {
+      data: input,
       fields: fields,
       form: form,
-      onChange: () => {}
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(GenerateButton, {
-      onClick: generatePost
+      onChange: onChange
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(GenerateButton, {
+      onClick: generateFromInput
     })]
   });
 };

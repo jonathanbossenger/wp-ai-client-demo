@@ -7,5 +7,7 @@ domReady( () => {
         document.getElementById( 'wp-ai-sdk-demo-app' )
     );
 
-    root.render( <SettingsPage /> );
+    root.render(
+        <SettingsPage />
+    );
 } );

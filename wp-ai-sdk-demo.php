@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+const WP_AI_SDK_DEMO_DEV_MODE = false;
+
 // Include the Composer autoloader.
 if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
     require_once dirname( __FILE__ ) . '/vendor/autoload.php';
@@ -72,19 +74,69 @@ function wp_ai_sdk_demo_register_generate_post_ability() {
 		'permission_callback' => function() {
 			return current_user_can( 'edit_posts' );
 		},
+		'meta' => array(
+			'show_in_rest' => true,
+		)
 	));
 }
 
+/**
+ * Generate a WordPress post using AI based on the provided title and prompt.
+ *
+ * @param $arguments
+ *
+ * @return array
+ */
 function wp_ai_sdk_demo_generate_post( $arguments ) {
-	// Use WP PHP AI SDK to generate post content and image, then create post using title
-	$user_prompt = $arguments['prompt'];
-	$user_prompt .= "\n\nMake sure the content uses Block Editor markup.";
-	$text = \WordPress\AI_Client\AI_Client::prompt( $user_prompt )->generateText();
-	//$image = \WordPress\AI_Client\AI_Client::prompt( $user_prompt )->generateImage();
+	if ( WP_AI_SDK_DEMO_DEV_MODE ){
+		return array(
+			'message' => 'Post creation skipped in dev mode.',
+		);
+	}
+	$content = wp_ai_sdk_generate_content( $arguments['prompt'] );
 
+	return wp_ai_sdk_demo_create_post( $arguments['title'], $content );
+}
+
+/**
+ * Generate content using the AI Client based on the provided prompt.
+ *
+ * @param $prompt
+ *
+ * @return mixed
+ */
+function wp_ai_sdk_generate_content( $prompt ) {
+	$prompt = rtrim( $prompt );
+	if ( ! str_ends_with( $prompt, '.' ) ) {
+		$prompt .= '.';
+	}
+	$prompt .= " Make sure the response uses WordPress Block Editor markup.";
+
+	return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generateText();
+}
+
+/**
+ * Generate an image using the AI Client based on the provided title.
+ *
+ * @param $title
+ *
+ * @return mixed
+ */
+function wp_ai_sdk_demo_create_image( $title ) {
+	$image_prompt = "Create a relevant featured image for a blog post with the following title: " . $title . ". Provide the image in a URL format suitable for web display.";
+	return \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generateImage();
+}
+
+/**
+ * @param $title
+ * @param $content
+ *
+ * @return array
+ */
+function wp_ai_sdk_demo_create_post( $title, $content ) {
 	$post_id = wp_insert_post( array(
-		'post_title'   => sanitize_text_field( $arguments['title'] ),
-		'post_content' => $text,
+		'post_title'   => sanitize_text_field( $title ),
+		'post_content' => $content,
 		'post_status'  => 'draft',
 		'post_type'    => 'post',
 	) );
@@ -112,13 +164,18 @@ function wp_ai_sdk_demo_init() {
     if ( class_exists( 'WordPress\AI_Client\AI_Client' ) ) {
         \WordPress\AI_Client\AI_Client::init();
     }
+	//WP_CLI::add_command( 'wp-ai-sdk-demo', 'wp_ai_sdk_demo_command' );
+}
+
+add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_sdk_demo_set_request_timeout' );
+function wp_ai_sdk_demo_set_request_timeout( $timeout ) {
+	return 60;
 }
 
 function wp_ai_sdk_demo_command( $args, $assoc_args ) {
-	$arguments = array(
-		'title'  => $args[0],
-		'prompt' => $args[1],
-	);
+	print_r( $args );
+	print_r( $assoc_args );
+	return;
 	return wp_ai_sdk_demo_generate_post( $arguments );
 }
 
@@ -164,4 +221,3 @@ function wp_ai_sdk_demo_admin_enqueue_scripts() {
         $asset_file['version']
     );
 }
-
