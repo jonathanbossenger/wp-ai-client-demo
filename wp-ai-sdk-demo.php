@@ -12,8 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const WP_AI_SDK_DEMO_DEV_MODE = true;
-const WP_AI_SDK_DEMO_LOGGER_ENABLED = true;
+const WP_AI_SDK_DEMO_DEV_MODE = false;
+const WP_AI_SDK_DEMO_LOGGER_ENABLED = false;
 
 // Include the Composer autoloader.
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
@@ -120,7 +120,7 @@ function wp_ai_sdk_generate_content( $prompt ) {
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 
-	$content = \WordPress\AI_Client\AI_Client::prompt( $prompt )->generateText();
+	$content = \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 	if ( WP_AI_SDK_DEMO_LOGGER_ENABLED ) {
 		error_log( 'Generated Content: ' . print_r( $content, true ) );
 	}
@@ -136,7 +136,7 @@ function wp_ai_sdk_generate_content( $prompt ) {
  */
 function wp_ai_sdk_demo_create_image( $title ) {
 	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '. Provide the image in a URL format suitable for web display.';
-	$image = \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generateImage();
+	$image = \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generate_image();
 	if ( WP_AI_SDK_DEMO_LOGGER_ENABLED ) {
 		error_log( 'Generated Image: ' . print_r( $image, true ) );
 	}
