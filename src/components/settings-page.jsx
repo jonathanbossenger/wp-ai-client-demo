@@ -9,6 +9,7 @@ import {
 import { useState, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
 import { getAbility, executeAbility } from '@wordpress/abilities';
+import { updateNotice, CustomNotice } from './notice';
 
 const SettingsTitle = () => {
     return (
@@ -53,10 +54,7 @@ const SettingsPage = () => {
         fields: [ 'title', 'prompt' ],
     };
 
-    const updateNotice = (message) => {
-        const noticeElement = document.getElementById( 'wp-ai-sdk-demo-notice' );
-        noticeElement.innerText = message;
-    }
+
 
     const onChange = ( edits ) => {
         setInput( ( current ) => ( {
@@ -68,25 +66,25 @@ const SettingsPage = () => {
     const generateFromInput = useCallback( async () => {
         const ability = getAbility( 'wp-ai-sdk-demo/generate-post' );
         if ( ! ability ) {
-            updateNotice('Whoops, post generation Ability not found.');
+            updateNotice('Whoops, post generation Ability not found.', 'error' );
             return;
         }
 
         try {
-            updateNotice('Attempting to execute post generation Ability, please hold for updates...');
+            updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info' );
             const result = await executeAbility( 'wp-ai-sdk-demo/generate-post', input );
         } catch ( err ) {
-            updateNotice('Error during post generation. Check console for details.');
+            updateNotice('Error during post generation. Check console for details.', 'error' );
             console.error( err );
         } finally {
-            updateNotice('Post generation completed!.');
+            updateNotice('Post generation completed!.', 'success' );
         }
     }, [ input ] );
 
     return (
         <VStack spacing={ 4 }>
             <SettingsTitle/>
-            <span id={"wp-ai-sdk-demo-notice"}>Ready to generate a post using AI?</span>
+            <CustomNotice />
             <DataForm
                 data={ input }
                 fields={ fields }
