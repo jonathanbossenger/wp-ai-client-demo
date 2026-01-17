@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: WP AI SDK Demo
- * Description: A demo plugin to showcase the integration of the WordPress AI SDK.
+ * Plugin Name: WP AI Client Demo
+ * Description: A demo plugin to showcase the integration of the WordPress AI Client.
  * Version: 1.0.0
  * Author: Jonathan Bossenger
- * Plugin URI: https://github.com/jonathanbossenger/wp-ai-sdk-demo
+ * Plugin URI: https://github.com/jonathanbossenger/wp-ai-client-demo
  *
- * @package wp-ai-sdk-demo
+ * @package wp-ai-client-demo
  */
 
 // Exit if accessed directly.
@@ -20,42 +20,42 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 }
 
 // Initialize the AI Client when WordPress initializes.
-add_action( 'init', 'wp_ai_sdk_demo_init' );
+add_action( 'init', 'wp_ai_client_demo_init' );
 /**
  * Initialize any plugin functionality
  *
  * @return void
  */
-function wp_ai_sdk_demo_init() {
+function wp_ai_client_demo_init() {
 	if ( class_exists( 'WordPress\AI_Client\AI_Client' ) ) {
 		\WordPress\AI_Client\AI_Client::init();
 	}
 }
 
-add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_sdk_demo_set_request_timeout' );
+add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_client_demo_set_request_timeout' );
 /**
  * Set a custom request timeout for the AI Client.
  *
  * @return int
  */
-function wp_ai_sdk_demo_set_request_timeout() {
+function wp_ai_client_demo_set_request_timeout() {
 	return 60;
 }
 
-add_action( 'admin_menu', 'wp_ai_sdk_demo_register_tools_submenu' );
+add_action( 'admin_menu', 'wp_ai_client_demo_register_tools_submenu' );
 /**
  * Register the WP AI SDK Demo Tools submenu page.
  *
  * @return void
  */
-function wp_ai_sdk_demo_register_tools_submenu() {
+function wp_ai_client_demo_register_tools_submenu() {
 	add_submenu_page(
 		'tools.php',
 		'WP AI SDK Demo',
 		'WP AI SDK Demo',
 		'manage_options',
-		'wp-ai-sdk-demo-tools',
-		'wp_ai_sdk_demo_tools_page_callback'
+		'wp-ai-client-demo-tools',
+		'wp_ai_client_demo_tools_page_callback'
 	);
 }
 
@@ -64,26 +64,26 @@ function wp_ai_sdk_demo_register_tools_submenu() {
  *
  * @return void
  */
-function wp_ai_sdk_demo_tools_page_callback() {
+function wp_ai_client_demo_tools_page_callback() {
 	printf(
-		'<div class="wrap" id="wp-ai-sdk-demo-app">%s</div>',
-		esc_html__( 'Loading…', 'wp-ai-sdk-demo' )
+		'<div class="wrap" id="wp-ai-client-demo-app">%s</div>',
+		esc_html__( 'Loading…', 'wp-ai-client-demo' )
 	);
 }
 
-add_action( 'admin_enqueue_scripts', 'wp_ai_sdk_demo_admin_enqueue_scripts' );
+add_action( 'admin_enqueue_scripts', 'wp_ai_client_demo_admin_enqueue_scripts' );
 /**
  * Enqueue Editor assets.
  */
-function wp_ai_sdk_demo_admin_enqueue_scripts() {
+function wp_ai_client_demo_admin_enqueue_scripts() {
 	$screen = get_current_screen();
-	if ( 'tools_page_wp-ai-sdk-demo-tools' !== $screen->id ) {
+	if ( 'tools_page_wp-ai-client-demo-tools' !== $screen->id ) {
 		return;
 	}
 	$asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
 	wp_enqueue_script(
-		'wp-ai-sdk-demo-scripts',
+		'wp-ai-client-demo-scripts',
 		plugins_url( 'build/index.js', __FILE__ ),
 		$asset_file['dependencies'],
 		$asset_file['version'],
@@ -91,35 +91,35 @@ function wp_ai_sdk_demo_admin_enqueue_scripts() {
 	);
 }
 
-add_action( 'wp_abilities_api_categories_init', 'wp_ai_sdk_demo_register_ability_categories' );
+add_action( 'wp_abilities_api_categories_init', 'wp_ai_client_demo_register_ability_categories' );
 /**
  * Register custom ability categories for the WP AI SDK Demo plugin.
  *
  * @return void
  */
-function wp_ai_sdk_demo_register_ability_categories() {
+function wp_ai_client_demo_register_ability_categories() {
 	wp_register_ability_category(
-		'wp-ai-sdk-demo',
+		'wp-ai-client-demo',
 		array(
-			'label'       => __( 'WP AI SDK Demo', 'wp-ai-sdk-demo' ),
-			'description' => __( 'Abilities for the WP AI SDK Demo.', 'wp-ai-sdk-demo' ),
+			'label'       => __( 'WP AI SDK Demo', 'wp-ai-client-demo' ),
+			'description' => __( 'Abilities for the WP AI SDK Demo.', 'wp-ai-client-demo' ),
 		)
 	);
 }
 
-add_action( 'wp_abilities_api_init', 'wp_ai_sdk_demo_register_generate_post_ability' );
+add_action( 'wp_abilities_api_init', 'wp_ai_client_demo_register_generate_post_ability' );
 /**
  * Register a custom ability to get site information.
  *
  * @return void
  */
-function wp_ai_sdk_demo_register_generate_post_ability() {
+function wp_ai_client_demo_register_generate_post_ability() {
 	wp_register_ability(
-		'wp-ai-sdk-demo/generate-post',
+		'wp-ai-client-demo/generate-post',
 		array(
-			'label'               => __( 'Generate a post via AI', 'wp-ai-sdk-demo' ),
-			'description'         => __( 'Based on a title and prompt, create an AI generated WordPress post.', 'wp-ai-sdk-demo' ),
-			'category'            => 'wp-ai-sdk-demo',
+			'label'               => __( 'Generate a post via AI', 'wp-ai-client-demo' ),
+			'description'         => __( 'Based on a title and prompt, create an AI generated WordPress post.', 'wp-ai-client-demo' ),
+			'category'            => 'wp-ai-client-demo',
 			'input_schema'        => array(
 				'type'       => 'object',
 				'properties' => array(
@@ -147,7 +147,7 @@ function wp_ai_sdk_demo_register_generate_post_ability() {
 				),
 				'required'   => array( 'message' ),
 			),
-			'execute_callback'    => 'wp_ai_sdk_demo_generate_post',
+			'execute_callback'    => 'wp_ai_client_demo_generate_post',
 			'permission_callback' => function () {
 				return current_user_can( 'edit_posts' );
 			},
@@ -164,11 +164,11 @@ function wp_ai_sdk_demo_register_generate_post_ability() {
  *
  * @return array
  */
-function wp_ai_sdk_demo_generate_post( $arguments ) {
-	$content = wp_ai_sdk_generate_content( $arguments['prompt'] );
-	$image   = wp_ai_sdk_demo_create_image( $arguments['title'] );
+function wp_ai_client_demo_generate_post( $arguments ) {
+	$content = wp_ai_client_generate_content( $arguments['prompt'] );
+	$image   = wp_ai_client_demo_create_image( $arguments['title'] );
 
-	return wp_ai_sdk_demo_create_post( $arguments['title'], $content, $image );
+	return wp_ai_client_demo_create_post( $arguments['title'], $content, $image );
 }
 /**
  * Generate content using the AI Client based on the provided prompt.
@@ -177,7 +177,7 @@ function wp_ai_sdk_demo_generate_post( $arguments ) {
  *
  * @return mixed
  */
-function wp_ai_sdk_generate_content( $prompt ) {
+function wp_ai_client_generate_content( $prompt ) {
 	$prompt = rtrim( $prompt );
 	if ( ! str_ends_with( $prompt, '.' ) ) {
 		$prompt .= '.';
@@ -193,7 +193,7 @@ function wp_ai_sdk_generate_content( $prompt ) {
  *
  * @return mixed
  */
-function wp_ai_sdk_demo_create_image( $title ) {
+function wp_ai_client_demo_create_image( $title ) {
 	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '. Provide the image in a URL format suitable for web display.';
 	$image        = \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generate_image();
 
@@ -208,7 +208,7 @@ function wp_ai_sdk_demo_create_image( $title ) {
  *
  * @return array
  */
-function wp_ai_sdk_demo_create_post( $title, $content, $image ) {
+function wp_ai_client_demo_create_post( $title, $content, $image ) {
 	$post_id = wp_insert_post(
 		array(
 			'post_title'   => sanitize_text_field( $title ),
@@ -224,7 +224,7 @@ function wp_ai_sdk_demo_create_post( $title, $content, $image ) {
 			'message' => $message,
 		);
 	}
-	$attachment_id = wp_ai_sdk_demo_image_to_media( $image, 'featured-image-' . sanitize_file_name( $title ), $post_id );
+	$attachment_id = wp_ai_client_demo_image_to_media( $image, 'featured-image-' . sanitize_file_name( $title ), $post_id );
 	if ( is_wp_error( $attachment_id ) ) {
 		$message = 'Post created, but featured image upload failed.';
 
@@ -251,7 +251,7 @@ function wp_ai_sdk_demo_create_post( $title, $content, $image ) {
  *
  * @return int|WP_Error
  */
-function wp_ai_sdk_demo_image_to_media( $image, $filename = null, $post_id = 0 ) {
+function wp_ai_client_demo_image_to_media( $image, $filename = null, $post_id = 0 ) {
 	$base64_string = $image->getBase64Data();
 	$mime          = $image->getMimeType();
 

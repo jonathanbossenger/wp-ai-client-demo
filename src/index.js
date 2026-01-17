@@ -4,7 +4,7 @@ import { SettingsPage } from './components/settings-page';
 
 domReady( () => {
     const root = createRoot(
-        document.getElementById( 'wp-ai-sdk-demo-app' )
+        document.getElementById( 'wp-ai-client-demo-app' )
     );
 
     root.render(

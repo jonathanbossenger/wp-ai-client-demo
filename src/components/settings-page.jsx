@@ -14,7 +14,7 @@ import { getAbility, executeAbility } from '@wordpress/abilities';
 const SettingsTitle = () => {
     return (
         <Heading level={ 1 }>
-            { __( 'WP AI SDK Demo', 'wp-ai-sdk-demo' ) }
+            { __( 'WP AI SDK Demo', 'wp-ai-client-demo' ) }
         </Heading>
     );
 };
@@ -23,7 +23,7 @@ const GenerateButton = ( { onClick } ) => {
     return (
         <div>
             <Button variant="primary" onClick={ onClick } __next40pxDefaultSize>
-                { __( 'Generate', 'wp-ai-sdk-demo' ) }
+                { __( 'Generate', 'wp-ai-client-demo' ) }
             </Button>
         </div>
     );
@@ -42,12 +42,12 @@ const SettingsPage = () => {
     const fields = [
         {
             id: 'title',
-            label: __( 'Title', 'wp-ai-sdk-demo' ),
+            label: __( 'Title', 'wp-ai-client-demo' ),
             type: 'text',
         },
         {
             id: 'prompt',
-            label: __( 'Prompt', 'wp-ai-sdk-demo' ),
+            label: __( 'Prompt', 'wp-ai-client-demo' ),
             type: 'text',
             Edit: 'textarea',
         }
@@ -70,14 +70,14 @@ const SettingsPage = () => {
     };
 
     const generateFromInput = useCallback( async () => {
-        const ability = getAbility( 'wp-ai-sdk-demo/generate-post' );
+        const ability = getAbility( 'wp-ai-client-demo/generate-post' );
         if ( ! ability ) {
             updateNotice('Whoops, post generation Ability not found.', 'error' );
             return;
         }
         try {
             updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info' );
-            const result = await executeAbility( 'wp-ai-sdk-demo/generate-post', input );
+            const result = await executeAbility( 'wp-ai-client-demo/generate-post', input );
         } catch ( err ) {
             updateNotice('Error during post generation. Check console for details.', 'error' );
             console.error( err );
