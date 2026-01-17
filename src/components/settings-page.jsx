@@ -5,11 +5,11 @@ import {
     // eslint-disable-next-line @wordpress/no-unsafe-wp-apis
     __experimentalVStack as VStack,
     Button,
+    Notice
 } from '@wordpress/components';
 import { useState, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
 import { getAbility, executeAbility } from '@wordpress/abilities';
-import { updateNotice, CustomNotice } from './notice';
 
 const SettingsTitle = () => {
     return (
@@ -30,6 +30,9 @@ const GenerateButton = ( { onClick } ) => {
 };
 
 const SettingsPage = () => {
+
+    const [ noticeStatus, setNoticeStatus ] = useState( 'info' );
+    const [ noticeMessage, setNoticeMessage ] = useState( 'Ready to generate a post using AI?' );
 
     const [input, setInput] = useState({
         title: "",
@@ -54,7 +57,10 @@ const SettingsPage = () => {
         fields: [ 'title', 'prompt' ],
     };
 
-
+    const updateNotice = ( message, status = 'info' ) => {
+        setNoticeMessage( message );
+        setNoticeStatus( status );
+    }
 
     const onChange = ( edits ) => {
         setInput( ( current ) => ( {
@@ -69,7 +75,6 @@ const SettingsPage = () => {
             updateNotice('Whoops, post generation Ability not found.', 'error' );
             return;
         }
-
         try {
             updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info' );
             const result = await executeAbility( 'wp-ai-sdk-demo/generate-post', input );
@@ -84,7 +89,9 @@ const SettingsPage = () => {
     return (
         <VStack spacing={ 4 }>
             <SettingsTitle/>
-            <CustomNotice />
+            <Notice status={ noticeStatus }>
+                { noticeMessage }
+            </Notice>
             <DataForm
                 data={ input }
                 fields={ fields }
