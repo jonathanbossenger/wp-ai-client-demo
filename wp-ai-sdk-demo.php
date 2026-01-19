@@ -166,8 +166,17 @@ function wp_ai_client_demo_register_generate_post_ability() {
  */
 function wp_ai_client_demo_generate_post( $arguments ) {
 	$content = wp_ai_client_generate_content( $arguments['prompt'] );
+	if ( is_wp_error( $content ) ) {
+		return array(
+			'message' => 'Post creation failed: ' . $content->get_error_message(),
+		);
+	}
 	$image   = wp_ai_client_demo_create_image( $arguments['title'] );
-
+	if ( is_wp_error( $image ) ) {
+		return array(
+			'message' => 'Post creation failed: ' . $image->get_error_message(),
+		);
+	}
 	return wp_ai_client_demo_create_post( $arguments['title'], $content, $image );
 }
 /**
@@ -183,8 +192,12 @@ function wp_ai_client_generate_content( $prompt ) {
 		$prompt .= '.';
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
+	try {
+		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
+	} catch ( Exception $e ) {
+		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
+	}
 
-	return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 }
 /**
  * Generate an image using the AI Client based on the provided title.
@@ -194,10 +207,13 @@ function wp_ai_client_generate_content( $prompt ) {
  * @return mixed
  */
 function wp_ai_client_demo_create_image( $title ) {
-	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '. Provide the image in a URL format suitable for web display.';
-	$image        = \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generate_image();
+	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '.';
+	try {
+		return \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generate_image();
+	}catch ( Exception $e ) {
+		return new WP_Error( 'image_creation_error', 'Error message', $e->getMessage() );
+	}
 
-	return $image;
 }
 /**
  * Create a WordPress post with the given title, content, and featured image.
