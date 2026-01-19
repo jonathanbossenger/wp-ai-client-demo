@@ -80,6 +80,9 @@ function wp_ai_client_demo_admin_enqueue_scripts() {
 	if ( 'tools_page_wp-ai-client-demo-tools' !== $screen->id ) {
 		return;
 	}
+
+	wp_enqueue_script( 'wp-ai-client' );
+
 	$asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
 	wp_enqueue_script(

@@ -7,7 +7,7 @@ import {
     Button,
     Notice
 } from '@wordpress/components';
-import { useState, useCallback } from "@wordpress/element";
+import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
 import { getAbility, executeAbility } from '@wordpress/abilities';
 
@@ -32,7 +32,7 @@ const GenerateButton = ( { onClick } ) => {
 const SettingsPage = () => {
 
     const [ noticeStatus, setNoticeStatus ] = useState( 'info' );
-    const [ noticeMessage, setNoticeMessage ] = useState( 'Ready to generate a post using AI?' );
+    const [ noticeMessage, setNoticeMessage ] = useState( 'Ready...' );
 
     const [input, setInput] = useState({
         title: "",
@@ -56,6 +56,11 @@ const SettingsPage = () => {
     const form = {
         fields: [ 'title', 'prompt' ],
     };
+
+    useEffect( async () => {
+        const text = await wp.aiClient.prompt('A short sentence encouraging the user to create a WordPress Post using AI.').generateText();
+        setNoticeMessage( text );
+    }, [] );
 
     const updateNotice = ( message, status = 'info' ) => {
         setNoticeMessage( message );
