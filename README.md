@@ -63,13 +63,3 @@ GPL-2.0-or-later
 ## Author
 
 Jonathan Bossenger
-
-## Support
-
-For issues and questions:
-- GitHub Issues: https://github.com/jonathanbossenger/wp-ai-sdk-demo/issues
-- Documentation: See the WP AI Client documentation for more details on the underlying library
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
