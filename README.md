@@ -25,7 +25,7 @@ WP AI Client Demo provides a practical example of integrating AI capabilities in
 1. Clone or download this plugin to your WordPress plugins directory:
    ```bash
    cd wp-content/plugins
-   git clone <repository-url> wp-ai-client-demo
+   git clone git@github.com:jonathanbossenger/wp-ai-client-demo.git
    ```
 
 2. Install PHP dependencies:
