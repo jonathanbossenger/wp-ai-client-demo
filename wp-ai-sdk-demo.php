@@ -29,38 +29,6 @@ add_action( 'init', 'wp_ai_client_demo_init' );
 function wp_ai_client_demo_init() {
 	if ( class_exists( 'WordPress\AI_Client\AI_Client' ) ) {
 		\WordPress\AI_Client\AI_Client::init();
-
-		// Register the Ollama provider.
-		wp_ai_client_demo_register_ollama_provider();
-	}
-}
-
-/**
- * Register the Ollama provider with the AI Client.
- *
- * @return void
- */
-function wp_ai_client_demo_register_ollama_provider() {
-	// Check if the Ollama provider class exists.
-	if ( ! class_exists( 'WpAiClientDemo\ProviderImplementations\Ollama\OllamaProvider' ) ) {
-		return;
-	}
-
-	try {
-		// Get the provider registry from the PHP AI Client.
-		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-
-		// Register the Ollama provider.
-		$registry->registerProvider( \WpAiClientDemo\ProviderImplementations\Ollama\OllamaProvider::class );
-
-		// Set no-auth authentication for Ollama (local server doesn't need API keys).
-		$no_auth = new \WpAiClientDemo\ProviderImplementations\Ollama\NoAuthRequestAuthentication();
-		$registry->setProviderRequestAuthentication( 'ollama', $no_auth );
-	} catch ( Exception $e ) {
-		// Log error if registration fails.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'Failed to register Ollama provider: ' . $e->getMessage() );
-		}
 	}
 }
 
@@ -91,238 +59,6 @@ function wp_ai_client_demo_register_tools_submenu() {
 	);
 }
 
-add_action( 'admin_menu', 'wp_ai_client_demo_register_local_ai_settings' );
-/**
- * Register the Local AI Model settings page.
- *
- * @return void
- */
-function wp_ai_client_demo_register_local_ai_settings() {
-	add_options_page(
-		__( 'Local AI Models', 'wp-ai-client-demo' ),
-		__( 'Local AI Models', 'wp-ai-client-demo' ),
-		'manage_options',
-		'wp-ai-client-demo-local-ai',
-		'wp_ai_client_demo_local_ai_settings_page'
-	);
-}
-
-add_action( 'admin_init', 'wp_ai_client_demo_register_local_ai_model_settings' );
-/**
- * Register settings for Local AI Model.
- *
- * @return void
- */
-function wp_ai_client_demo_register_local_ai_model_settings() {
-	register_setting(
-		'wp_ai_client_demo_local_ai',
-		'wp_ai_client_demo_ollama_model',
-		array(
-			'type'              => 'string',
-			'default'           => '',
-			'sanitize_callback' => 'sanitize_text_field',
-		)
-	);
-
-	add_settings_section(
-		'wp_ai_client_demo_local_ai_section',
-		__( 'Ollama Model Selection', 'wp-ai-client-demo' ),
-		'wp_ai_client_demo_local_ai_section_callback',
-		'wp-ai-client-demo-local-ai'
-	);
-
-	add_settings_field(
-		'wp_ai_client_demo_ollama_model',
-		__( 'Select Ollama Model', 'wp-ai-client-demo' ),
-		'wp_ai_client_demo_ollama_model_field_callback',
-		'wp-ai-client-demo-local-ai',
-		'wp_ai_client_demo_local_ai_section'
-	);
-}
-
-/**
- * Settings section callback.
- *
- * @return void
- */
-function wp_ai_client_demo_local_ai_section_callback() {
-	echo '<p>' . esc_html__( 'Choose which Ollama model to use for AI-powered post generation.', 'wp-ai-client-demo' ) . '</p>';
-}
-
-/**
- * Ollama model field callback.
- *
- * @return void
- */
-function wp_ai_client_demo_ollama_model_field_callback() {
-	$selected_model = get_option( 'wp_ai_client_demo_ollama_model', '' );
-	$models         = wp_ai_client_demo_get_ollama_models();
-
-	if ( is_wp_error( $models ) ) {
-		echo '<p class="description" style="color: #d63638;">';
-		echo '<strong>' . esc_html__( 'Error:', 'wp-ai-client-demo' ) . '</strong> ';
-		echo esc_html( $models->get_error_message() );
-		echo '</p>';
-		echo '<p class="description">' . esc_html__( 'Please ensure Ollama is running on http://localhost:11434', 'wp-ai-client-demo' ) . '</p>';
-		return;
-	}
-
-	if ( empty( $models ) ) {
-		echo '<p class="description">' . esc_html__( 'No Ollama models found. Please pull at least one model using: ollama pull llama2', 'wp-ai-client-demo' ) . '</p>';
-		return;
-	}
-
-	echo '<select id="wp_ai_client_demo_ollama_model" name="wp_ai_client_demo_ollama_model">';
-	echo '<option value="">' . esc_html__( '-- Select a model --', 'wp-ai-client-demo' ) . '</option>';
-
-	foreach ( $models as $model ) {
-		$selected = selected( $selected_model, $model['id'], false );
-		printf(
-			'<option value="%s"%s>%s</option>',
-			esc_attr( $model['id'] ),
-			$selected,
-			esc_html( $model['name'] )
-		);
-	}
-
-	echo '</select>';
-	echo '<p class="description">' . esc_html__( 'Select which local Ollama model to use for text generation.', 'wp-ai-client-demo' ) . '</p>';
-}
-
-/**
- * Get available Ollama models.
- *
- * @return array|WP_Error Array of models or WP_Error on failure.
- */
-function wp_ai_client_demo_get_ollama_models() {
-	// Try to get cached models first (cache for 5 minutes).
-	$cached_models = get_transient( 'wp_ai_client_demo_ollama_models' );
-	if ( false !== $cached_models ) {
-		return $cached_models;
-	}
-
-	// Fetch models from Ollama API.
-	$response = wp_remote_get( 'http://localhost:11434/api/tags' );
-
-	if ( is_wp_error( $response ) ) {
-		return new WP_Error(
-			'ollama_connection_error',
-			__( 'Cannot connect to Ollama. Please ensure it is running.', 'wp-ai-client-demo' )
-		);
-	}
-
-	$response_code = wp_remote_retrieve_response_code( $response );
-	if ( 200 !== $response_code ) {
-		return new WP_Error(
-			'ollama_api_error',
-			sprintf(
-				/* translators: %d: HTTP response code */
-				__( 'Ollama API returned error code: %d', 'wp-ai-client-demo' ),
-				$response_code
-			)
-		);
-	}
-
-	$body = wp_remote_retrieve_body( $response );
-	$data = json_decode( $body, true );
-
-	if ( ! isset( $data['models'] ) || ! is_array( $data['models'] ) ) {
-		return new WP_Error(
-			'ollama_invalid_response',
-			__( 'Invalid response from Ollama API.', 'wp-ai-client-demo' )
-		);
-	}
-
-	// Format models for display.
-	$models = array();
-	foreach ( $data['models'] as $model ) {
-		if ( isset( $model['name'] ) ) {
-			$models[] = array(
-				'id'   => $model['name'],
-				'name' => $model['name'],
-			);
-		}
-	}
-
-	// Cache the results.
-	set_transient( 'wp_ai_client_demo_ollama_models', $models, 5 * MINUTE_IN_SECONDS );
-
-	return $models;
-}
-
-/**
- * Render the Local AI Model settings page.
- *
- * @return void
- */
-function wp_ai_client_demo_local_ai_settings_page() {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
-
-	// Handle refresh action.
-	if ( isset( $_GET['action'] ) && 'refresh' === $_GET['action'] && check_admin_referer( 'wp_ai_client_demo_refresh_models' ) ) {
-		delete_transient( 'wp_ai_client_demo_ollama_models' );
-		add_settings_error(
-			'wp_ai_client_demo_messages',
-			'wp_ai_client_demo_message',
-			__( 'Model list refreshed successfully.', 'wp-ai-client-demo' ),
-			'success'
-		);
-	}
-
-	// Check if settings were updated.
-	if ( isset( $_GET['settings-updated'] ) ) {
-		add_settings_error(
-			'wp_ai_client_demo_messages',
-			'wp_ai_client_demo_message',
-			__( 'Settings saved successfully.', 'wp-ai-client-demo' ),
-			'success'
-		);
-	}
-
-	settings_errors( 'wp_ai_client_demo_messages' );
-	?>
-	<div class="wrap">
-		<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-
-		<form method="post" action="options.php">
-			<?php
-			settings_fields( 'wp_ai_client_demo_local_ai' );
-			do_settings_sections( 'wp-ai-client-demo-local-ai' );
-			submit_button( __( 'Save Settings', 'wp-ai-client-demo' ) );
-			?>
-		</form>
-
-		<div class="card">
-			<h2><?php esc_html_e( 'About Ollama Models', 'wp-ai-client-demo' ); ?></h2>
-			<p><?php esc_html_e( 'Ollama allows you to run large language models locally on your computer without requiring API keys or internet connectivity.', 'wp-ai-client-demo' ); ?></p>
-
-			<h3><?php esc_html_e( 'How to get started:', 'wp-ai-client-demo' ); ?></h3>
-			<ol>
-				<li><?php esc_html_e( 'Install Ollama from https://ollama.com', 'wp-ai-client-demo' ); ?></li>
-				<li><?php esc_html_e( 'Pull a model: ollama pull llama3.2', 'wp-ai-client-demo' ); ?></li>
-				<li><?php esc_html_e( 'Ensure Ollama is running (it starts automatically on most systems)', 'wp-ai-client-demo' ); ?></li>
-				<li><?php esc_html_e( 'Select your preferred model above', 'wp-ai-client-demo' ); ?></li>
-			</ol>
-
-			<h3><?php esc_html_e( 'Recommended Models:', 'wp-ai-client-demo' ); ?></h3>
-			<ul>
-				<li><strong>llama3.2</strong> - <?php esc_html_e( 'Best balance of speed and quality', 'wp-ai-client-demo' ); ?></li>
-				<li><strong>mistral</strong> - <?php esc_html_e( 'Great for creative content', 'wp-ai-client-demo' ); ?></li>
-				<li><strong>codellama</strong> - <?php esc_html_e( 'Optimized for technical content', 'wp-ai-client-demo' ); ?></li>
-				<li><strong>phi</strong> - <?php esc_html_e( 'Fastest, good for testing', 'wp-ai-client-demo' ); ?></li>
-			</ul>
-
-			<p>
-				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'options-general.php?page=wp-ai-client-demo-local-ai&action=refresh' ), 'wp_ai_client_demo_refresh_models' ) ); ?>" class="button">
-					<?php esc_html_e( 'Refresh Model List', 'wp-ai-client-demo' ); ?>
-				</a>
-			</p>
-		</div>
-	</div>
-	<?php
-}
 
 /**
  * Render the WP AI SDK Demo Tools page.
@@ -462,26 +198,27 @@ function wp_ai_client_generate_content( $prompt ) {
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 
 	try {
-		// Check if a specific Ollama model is selected.
-		$selected_ollama_model = get_option( 'wp_ai_client_demo_ollama_model', '' );
+		// Check for selected Ollama model from wp-local-model-provider.
+		if ( function_exists( 'wp_local_model_provider_get_selected_model' ) ) {
+			$selected_ollama_model = wp_local_model_provider_get_selected_model( 'ollama' );
 
-		if ( ! empty( $selected_ollama_model ) && class_exists( 'WpAiClientDemo\ProviderImplementations\Ollama\OllamaProvider' ) ) {
-			// Use the explicitly selected Ollama model.
-			$model    = \WpAiClientDemo\ProviderImplementations\Ollama\OllamaProvider::model( $selected_ollama_model );
-			$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-			$registry->bindModelDependencies( $model );
+			if ( ! empty( $selected_ollama_model ) &&
+			     class_exists( 'WpLocalModelProvider\Providers\Ollama\OllamaProvider' ) ) {
+				$model    = \WpLocalModelProvider\Providers\Ollama\OllamaProvider::model( $selected_ollama_model );
+				$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+				$registry->bindModelDependencies( $model );
 
-			return \WordPress\AI_Client\AI_Client::prompt( $prompt )
-				->using_model( $model )
-				->generate_text();
+				return \WordPress\AI_Client\AI_Client::prompt( $prompt )
+					->using_model( $model )
+					->generate_text();
+			}
 		}
 
-		// Fall back to automatic provider/model selection.
+		// Fall back to automatic provider/model selection (cloud providers).
 		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 	} catch ( Exception $e ) {
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
 	}
-
 }
 /**
  * Generate an image using the AI Client based on the provided title.
