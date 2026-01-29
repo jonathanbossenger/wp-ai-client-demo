@@ -174,13 +174,14 @@ function wp_ai_client_demo_generate_post( $arguments ) {
 			'message' => 'Post creation failed: ' . $content->get_error_message(),
 		);
 	}
+
 	$image   = wp_ai_client_demo_create_image( $arguments['title'] );
 	if ( is_wp_error( $image ) ) {
 		return array(
 			'message' => 'Post creation failed: ' . $image->get_error_message(),
 		);
 	}
-	return wp_ai_client_demo_create_post( $arguments['title'], $content, $image );
+    return wp_ai_client_demo_create_post( $arguments['title'], $content, $image );
 }
 /**
  * Generate content using the AI Client based on the provided prompt.
@@ -211,12 +212,17 @@ function wp_ai_client_generate_content( $prompt ) {
  */
 function wp_ai_client_demo_create_image( $title ) {
 	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '.';
-	try {
-		return \WordPress\AI_Client\AI_Client::prompt( $image_prompt )->generate_image();
-	}catch ( Exception $e ) {
-		return new WP_Error( 'image_creation_error', 'Error message', $e->getMessage() );
-	}
 
+    $prompt = \WordPress\AI_Client\AI_Client::prompt( $image_prompt );
+
+    if ( ! $prompt->is_supported_for_image_generation() ){
+        return null;
+    }
+    try {
+        return $prompt->generate_image();
+    }catch ( Exception $e ) {
+        return new WP_Error( 'image_creation_error', 'Error message', $e->getMessage() );
+    }
 }
 /**
  * Create a WordPress post with the given title, content, and featured image.
@@ -243,7 +249,15 @@ function wp_ai_client_demo_create_post( $title, $content, $image ) {
 			'message' => $message,
 		);
 	}
-	$attachment_id = wp_ai_client_demo_image_to_media( $image, 'featured-image-' . sanitize_file_name( $title ), $post_id );
+    if ( null === $image ) {
+        $message = 'Post created successfully without featured image.';
+
+        return array(
+            'message' => $message,
+            'post_id' => $post_id,
+        );
+    }
+    $attachment_id = wp_ai_client_demo_image_to_media( $image, 'featured-image-' . sanitize_file_name( $title ), $post_id );
 	if ( is_wp_error( $attachment_id ) ) {
 		$message = 'Post created, but featured image upload failed.';
 
