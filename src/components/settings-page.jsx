@@ -94,17 +94,7 @@ const SettingsPage = () => {
             setIsGenerating( true );
             updateNotice('Initializing post generation...', 'info' );
             
-            // Simulate granular progress updates
-            await new Promise( resolve => setTimeout( resolve, 500 ) );
-            updateNotice('Preparing AI client...', 'info' );
-            
-            await new Promise( resolve => setTimeout( resolve, 500 ) );
-            updateNotice('Executing ability with your prompt...', 'info' );
-            
             const result = await executeAbility( 'wp-ai-client-demo/generate-post', input );
-            
-            updateNotice('Finalizing post generation...', 'info' );
-            await new Promise( resolve => setTimeout( resolve, 300 ) );
             
             updateNotice('Post generation completed successfully!', 'success' );
         } catch ( err ) {
