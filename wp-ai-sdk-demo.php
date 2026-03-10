@@ -77,6 +77,7 @@ add_action( 'admin_enqueue_scripts', 'wp_ai_client_demo_admin_enqueue_scripts' )
  */
 function wp_ai_client_demo_admin_enqueue_scripts() {
 	$screen = get_current_screen();
+
 	if ( 'tools_page_wp-ai-client-demo-tools' !== $screen->id ) {
 		return;
 	}
@@ -201,7 +202,6 @@ function wp_ai_client_generate_content( $prompt ) {
 	} catch ( Exception $e ) {
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
 	}
-
 }
 /**
  * Generate an image using the AI Client based on the provided title.
