@@ -9,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
-import { getAbility, executeAbility } from '@wordpress/abilities';
+const { getAbility, executeAbility } = (await import( '@wordpress/abilities' ) );
 
 const SettingsTitle = () => {
     return (
@@ -30,6 +30,11 @@ const GenerateButton = ( { onClick } ) => {
 };
 
 const SettingsPage = () => {
+
+    /*
+    const [ abilitiesAPI, setAbilitiesAPI ] = useState();
+    const { getAbility, executeAbility } = abilitiesAPI || {};
+    */
 
     const [ noticeStatus, setNoticeStatus ] = useState( 'info' );
     const [ noticeMessage, setNoticeMessage ] = useState( 'Ready...' );
@@ -58,6 +63,9 @@ const SettingsPage = () => {
     };
 
     useEffect( async () => {
+        /*import( '@wordpress/abilities' ).then( ( module ) => {
+            setAbilitiesAPI( module );
+        } );*/
         const text = await wp.aiClient.prompt('A short sentence encouraging the user to create a WordPress Post using AI.').generateText();
         setNoticeMessage( text );
     }, [] );
