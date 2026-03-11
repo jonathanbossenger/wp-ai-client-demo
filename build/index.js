@@ -29044,7 +29044,7 @@ const SettingsPage = () => {
     fields: ['title', 'prompt']
   };
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(async () => {
-    const text = await wp.aiClient.prompt('A short sentence encouraging the user to create a WordPress Post using AI.').generateText();
+    const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
     setNoticeMessage(text);
   }, []);
   const updateNotice = (message, status = 'info') => {

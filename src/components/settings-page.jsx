@@ -58,7 +58,7 @@ const SettingsPage = () => {
     };
 
     useEffect( async () => {
-        const text = await wp.aiClient.prompt('A short sentence encouraging the user to create a WordPress Post using AI.').generateText();
+        const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
         setNoticeMessage( text );
     }, [] );
 

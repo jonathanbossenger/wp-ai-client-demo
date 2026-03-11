@@ -91,7 +91,7 @@ function wp_ai_client_demo_admin_enqueue_scripts() {
 	wp_enqueue_script(
 		'wp-ai-client-demo-scripts',
 		plugins_url( 'build/index.js', __FILE__ ),
-        array('react', 'react-dom', 'react-jsx-runtime', 'wp-components', 'wp-data', 'wp-date', 'wp-dom-ready', 'wp-element', 'wp-hooks', 'wp-i18n'),
+        $asset_file['dependencies'],
 		$asset_file['version'],
 		true
 	);
