@@ -20,7 +20,6 @@
         "wp-coding-standards/wpcs": "^3.0"
     },
     "require": {
-        "wordpress/wp-ai-client": "0.3.0",
-        "wordpress/abilities-api": "^0.4.0"
+        "wordpress/wp-ai-client": "^0.4.0"
     }
 }

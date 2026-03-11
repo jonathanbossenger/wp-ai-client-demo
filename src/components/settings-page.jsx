@@ -9,7 +9,9 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
-import { getAbility, executeAbility } from '@wordpress/abilities';
+const abilitiesApi = await import( '@wordpress/abilities' );
+
+console.log( abilitiesApi );
 
 const SettingsTitle = () => {
     return (
@@ -30,6 +32,8 @@ const GenerateButton = ( { onClick } ) => {
 };
 
 const SettingsPage = () => {
+
+    const { getAbility, executeAbility } = abilitiesApi;
 
     const [ noticeStatus, setNoticeStatus ] = useState( 'info' );
     const [ noticeMessage, setNoticeMessage ] = useState( 'Ready...' );
