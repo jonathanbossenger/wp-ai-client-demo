@@ -9,9 +9,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
-const abilitiesApi = await import( '@wordpress/abilities' );
 
-console.log( abilitiesApi );
 
 const SettingsTitle = () => {
     return (
@@ -32,8 +30,14 @@ const GenerateButton = ( { onClick } ) => {
 };
 
 const SettingsPage = () => {
+    const [ abilitiesAPI, setAbilitiesAPI ] = useState();
 
-    const { getAbility, executeAbility } = abilitiesApi;
+    useEffect( () => {
+        import( '@wordpress/abilities' ).then( ( module ) => {
+            setAbilitiesAPI( module );
+        } );
+    }, [] );
+
 
     const [ noticeStatus, setNoticeStatus ] = useState( 'info' );
     const [ noticeMessage, setNoticeMessage ] = useState( 'Ready...' );
@@ -94,6 +98,11 @@ const SettingsPage = () => {
             updateNotice('Post generation completed!.', 'success' );
         }
     }, [ input ] );
+
+    if( ! abilitiesAPI ) {
+        return null;
+    }
+    console.log( 'Abilities API:', abilitiesAPI );
 
     return (
         <VStack spacing={ 4 }>
