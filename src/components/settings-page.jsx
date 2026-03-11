@@ -103,6 +103,9 @@ const SettingsPage = () => {
         return null;
     }
     console.log( 'Abilities API:', abilitiesAPI );
+        setTimeout(
+        () => console.log( 'Abilities API timeout:', abilitiesAPI.getAbilities() )    
+        , 1000);
 
     return (
         <VStack spacing={ 4 }>
