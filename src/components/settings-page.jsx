@@ -9,6 +9,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
+import( '@wordpress/core-abilities' );
 
 
 const SettingsTitle = () => {
