@@ -16,7 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Include the Composer autoloader.
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-	require_once __DIR__ . '/vendor/autoload.php';
+    require_once __DIR__ . '/vendor/autoload.php';
+} else {
+    wp_die( 'Please run "composer install" in the plugin directory to install the required dependencies.' );
 }
 
 // Initialize the AI Client when WordPress initializes.
