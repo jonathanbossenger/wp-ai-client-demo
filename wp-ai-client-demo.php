@@ -174,15 +174,12 @@ function wp_ai_client_demo_register_generate_post_ability() {
 function wp_ai_client_demo_generate_post( $arguments ) {
 	$content = wp_ai_client_generate_content( $arguments['prompt'] );
 	if ( is_wp_error( $content ) ) {
-        error_log( print_r( $content, true ) );
 		return array(
 			'message' => 'Post creation failed: ' . $content->get_error_message(),
 		);
 	}
-
 	$image   = wp_ai_client_demo_create_image( $arguments['title'] );
 	if ( is_wp_error( $image ) ) {
-        error_log( print_r( $image, true ) );
 		return array(
 			'message' => 'Post creation failed: ' . $image->get_error_message(),
 		);
@@ -203,7 +200,7 @@ function wp_ai_client_generate_content( $prompt ) {
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 	try {
-        // gather_posts
+        // gather_posts and pass as context
 		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 	} catch ( Exception $e ) {
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
@@ -218,9 +215,7 @@ function wp_ai_client_generate_content( $prompt ) {
  */
 function wp_ai_client_demo_create_image( $title ) {
 	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '.';
-
     $prompt = \WordPress\AI_Client\AI_Client::prompt( $image_prompt );
-
     if ( ! $prompt->is_supported_for_image_generation() ){
         return null;
     }
