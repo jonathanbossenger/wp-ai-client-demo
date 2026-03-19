@@ -84,19 +84,17 @@ function wp_ai_client_demo_admin_enqueue_scripts() {
 
     // Should be removed once 7.0 is released.
     wp_enqueue_script_module( '@wordpress/core-abilities' );
+    wp_enqueue_script_module( '@wordpress/abilities' );
 
-	wp_enqueue_script( 'wp-ai-client' );
+    wp_enqueue_script( 'wp-ai-client' );
 
-	$asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
-    // remove wp-abilities from dependencies see https://github.com/WordPress/gutenberg/issues/75196
-    $dependencies = array_diff( $asset_file['dependencies'], array( 'wp-abilities' ) );
+    $asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
-    wp_enqueue_script(
-        'wp-ai-client-demo-scripts',
+    wp_enqueue_script_module(
+        'wp-ai-client-demo-script',
         plugins_url( 'build/index.js', __FILE__ ),
-        $dependencies,
+        array( '@wordpress/abilities' ),
         $asset_file['version'],
-        array( 'in_footer' => true, 'module_dependencies' => array( '@wordpress/abilities' ) ),
     );
 }
 
@@ -203,7 +201,8 @@ function wp_ai_client_generate_content( $prompt ) {
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 	try {
-		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
+        // gather_posts
+		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->using_abilities()->generate_text();
 	} catch ( Exception $e ) {
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
 	}
