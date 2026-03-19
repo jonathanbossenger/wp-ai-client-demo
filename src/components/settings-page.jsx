@@ -9,10 +9,10 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
-const { getAbility, executeAbility } = await import( '@wordpress/abilities' );
 
-console.log( getAbility );
-console.log( executeAbility );
+// Uses /* webpackIgnore: true */ to tell webpack to skip bundling this import and leave it as a runtime ES module import.
+// Needed until https://github.com/WordPress/gutenberg/issues/75196 is fixed
+const { getAbility, executeAbility } = await import( /* webpackIgnore: true */ '@wordpress/abilities' );
 
 const SettingsTitle = () => {
     return (
@@ -80,7 +80,7 @@ const SettingsPage = () => {
         } ) );
     };
 
-    const generateFromInput = useCallback( () => {
+    const generateFromInput = useCallback( async () => {
         const generatePostAbility = getAbility( 'wp-ai-client-demo/generate-post' );
         if ( ! generatePostAbility ) {
             updateNotice('Whoops, post generation Ability not found.', 'error' );
@@ -88,7 +88,8 @@ const SettingsPage = () => {
         }
         try {
             updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info' );
-            const result = executeAbility( 'wp-ai-client-demo/generate-post', input );
+            const result = await executeAbility( 'wp-ai-client-demo/generate-post', input );
+            console.log(result);
         } catch ( err ) {
             updateNotice('Error during post generation. Check console for details.', 'error' );
             console.error( err );

@@ -29006,9 +29006,7 @@ __webpack_require__.r(__webpack_exports__);
 const {
   getAbility,
   executeAbility
-} = await Promise.resolve(/*! import() */).then(__webpack_require__.t.bind(__webpack_require__, /*! @wordpress/abilities */ "@wordpress/abilities", 23));
-console.log(getAbility);
-console.log(executeAbility);
+} = await import(/* webpackIgnore: true */'@wordpress/abilities');
 const SettingsTitle = () => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
     level: 1,
@@ -29064,7 +29062,7 @@ const SettingsPage = () => {
       ...edits
     }));
   };
-  const generateFromInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useCallback)(() => {
+  const generateFromInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useCallback)(async () => {
     const generatePostAbility = getAbility('wp-ai-client-demo/generate-post');
     if (!generatePostAbility) {
       updateNotice('Whoops, post generation Ability not found.', 'error');
@@ -29072,7 +29070,8 @@ const SettingsPage = () => {
     }
     try {
       updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info');
-      const result = executeAbility('wp-ai-client-demo/generate-post', input);
+      const result = await executeAbility('wp-ai-client-demo/generate-post', input);
+      console.log(result);
     } catch (err) {
       updateNotice('Error during post generation. Check console for details.', 'error');
       console.error(err);
@@ -31064,17 +31063,6 @@ module.exports = window["ReactDOM"];
 
 "use strict";
 module.exports = window["ReactJSXRuntime"];
-
-/***/ },
-
-/***/ "@wordpress/abilities"
-/*!***********************************!*\
-  !*** external ["wp","abilities"] ***!
-  \***********************************/
-(module) {
-
-"use strict";
-module.exports = window["wp"]["abilities"];
 
 /***/ },
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP AI Client Demo
  * Description: A demo plugin to showcase the integration of the WordPress AI Client.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Jonathan Bossenger
  * Plugin URI: https://github.com/jonathanbossenger/wp-ai-client-demo
  *
@@ -39,7 +39,7 @@ add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_client_demo_set_reque
  * @return int
  */
 function wp_ai_client_demo_set_request_timeout() {
-	return 60;
+	return 90;
 }
 
 add_action( 'admin_menu', 'wp_ai_client_demo_register_tools_submenu' );
@@ -82,11 +82,11 @@ function wp_ai_client_demo_admin_enqueue_scripts() {
 		return;
 	}
 
+    wp_enqueue_script( 'wp-ai-client' );
+
     // Should be removed once 7.0 is released.
     wp_enqueue_script_module( '@wordpress/core-abilities' );
     wp_enqueue_script_module( '@wordpress/abilities' );
-
-    wp_enqueue_script( 'wp-ai-client' );
 
     $asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
@@ -174,6 +174,7 @@ function wp_ai_client_demo_register_generate_post_ability() {
 function wp_ai_client_demo_generate_post( $arguments ) {
 	$content = wp_ai_client_generate_content( $arguments['prompt'] );
 	if ( is_wp_error( $content ) ) {
+        error_log( print_r( $content, true ) );
 		return array(
 			'message' => 'Post creation failed: ' . $content->get_error_message(),
 		);
@@ -181,6 +182,7 @@ function wp_ai_client_demo_generate_post( $arguments ) {
 
 	$image   = wp_ai_client_demo_create_image( $arguments['title'] );
 	if ( is_wp_error( $image ) ) {
+        error_log( print_r( $image, true ) );
 		return array(
 			'message' => 'Post creation failed: ' . $image->get_error_message(),
 		);
@@ -202,7 +204,7 @@ function wp_ai_client_generate_content( $prompt ) {
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 	try {
         // gather_posts
-		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->using_abilities()->generate_text();
+		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 	} catch ( Exception $e ) {
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
 	}
