@@ -9,9 +9,10 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { DataForm } from '@wordpress/dataviews/wp';
-const abilitiesApi = await import( '@wordpress/abilities' );
 
-console.log( abilitiesApi );
+// Uses /* webpackIgnore: true */ to tell webpack to skip bundling this import and leave it as a runtime ES module import.
+// Needed until https://github.com/WordPress/gutenberg/issues/75196 is fixed
+const { getAbility, executeAbility } = await import( /* webpackIgnore: true */ '@wordpress/abilities' );
 
 const SettingsTitle = () => {
     return (
@@ -32,8 +33,6 @@ const GenerateButton = ( { onClick } ) => {
 };
 
 const SettingsPage = () => {
-
-    const { getAbility, executeAbility } = abilitiesApi;
 
     const [ noticeStatus, setNoticeStatus ] = useState( 'info' );
     const [ noticeMessage, setNoticeMessage ] = useState( 'Ready...' );
@@ -61,9 +60,12 @@ const SettingsPage = () => {
         fields: [ 'title', 'prompt' ],
     };
 
-    useEffect( async () => {
-        const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
-        setNoticeMessage( text );
+    useEffect( () => {
+        async function updateMessage() {
+            const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
+            setNoticeMessage( text );
+        }
+        updateMessage();
     }, [] );
 
     const updateNotice = ( message, status = 'info' ) => {
@@ -79,14 +81,15 @@ const SettingsPage = () => {
     };
 
     const generateFromInput = useCallback( async () => {
-        const ability = getAbility( 'wp-ai-client-demo/generate-post' );
-        if ( ! ability ) {
+        const generatePostAbility = getAbility( 'wp-ai-client-demo/generate-post' );
+        if ( ! generatePostAbility ) {
             updateNotice('Whoops, post generation Ability not found.', 'error' );
             return;
         }
         try {
             updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info' );
             const result = await executeAbility( 'wp-ai-client-demo/generate-post', input );
+            console.log(result);
         } catch ( err ) {
             updateNotice('Error during post generation. Check console for details.', 'error' );
             console.error( err );

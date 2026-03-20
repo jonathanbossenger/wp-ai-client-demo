@@ -29003,8 +29003,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const abilitiesApi = await Promise.resolve(/*! import() */).then(__webpack_require__.t.bind(__webpack_require__, /*! @wordpress/abilities */ "@wordpress/abilities", 23));
-console.log(abilitiesApi);
+const {
+  getAbility,
+  executeAbility
+} = await import(/* webpackIgnore: true */'@wordpress/abilities');
 const SettingsTitle = () => {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
     level: 1,
@@ -29024,10 +29026,6 @@ const GenerateButton = ({
   });
 };
 const SettingsPage = () => {
-  const {
-    getAbility,
-    executeAbility
-  } = abilitiesApi;
   const [noticeStatus, setNoticeStatus] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)('info');
   const [noticeMessage, setNoticeMessage] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)('Ready...');
   const [input, setInput] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({
@@ -29047,9 +29045,12 @@ const SettingsPage = () => {
   const form = {
     fields: ['title', 'prompt']
   };
-  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(async () => {
-    const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
-    setNoticeMessage(text);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    async function updateMessage() {
+      const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
+      setNoticeMessage(text);
+    }
+    updateMessage();
   }, []);
   const updateNotice = (message, status = 'info') => {
     setNoticeMessage(message);
@@ -29062,14 +29063,15 @@ const SettingsPage = () => {
     }));
   };
   const generateFromInput = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useCallback)(async () => {
-    const ability = getAbility('wp-ai-client-demo/generate-post');
-    if (!ability) {
+    const generatePostAbility = getAbility('wp-ai-client-demo/generate-post');
+    if (!generatePostAbility) {
       updateNotice('Whoops, post generation Ability not found.', 'error');
       return;
     }
     try {
       updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info');
       const result = await executeAbility('wp-ai-client-demo/generate-post', input);
+      console.log(result);
     } catch (err) {
       updateNotice('Error during post generation. Check console for details.', 'error');
       console.error(err);
@@ -31061,17 +31063,6 @@ module.exports = window["ReactDOM"];
 
 "use strict";
 module.exports = window["ReactJSXRuntime"];
-
-/***/ },
-
-/***/ "@wordpress/abilities"
-/*!***********************************!*\
-  !*** external ["wp","abilities"] ***!
-  \***********************************/
-(module) {
-
-"use strict";
-module.exports = window["wp"]["abilities"];
 
 /***/ },
 
@@ -44286,11 +44277,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_ui_utils_useMergedRefs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @base-ui/utils/useMergedRefs */ "./node_modules/@base-ui/utils/esm/useMergedRefs.js");
 /* harmony import */ var _base_ui_utils_getReactElementRef__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @base-ui/utils/getReactElementRef */ "./node_modules/@base-ui/utils/esm/getReactElementRef.js");
 /* harmony import */ var _base_ui_utils_mergeObjects__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @base-ui/utils/mergeObjects */ "./node_modules/@base-ui/utils/esm/mergeObjects.js");
-/* harmony import */ var _getStateAttributesProps_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./getStateAttributesProps.js */ "./node_modules/@base-ui/react/esm/utils/getStateAttributesProps.js");
-/* harmony import */ var _resolveClassName_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./resolveClassName.js */ "./node_modules/@base-ui/react/esm/utils/resolveClassName.js");
-/* harmony import */ var _resolveStyle_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./resolveStyle.js */ "./node_modules/@base-ui/react/esm/utils/resolveStyle.js");
-/* harmony import */ var _merge_props_index_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../merge-props/index.js */ "./node_modules/@base-ui/react/esm/merge-props/mergeProps.js");
-/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./constants.js */ "./node_modules/@base-ui/utils/esm/empty.js");
+/* harmony import */ var _base_ui_utils_warn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @base-ui/utils/warn */ "./node_modules/@base-ui/utils/esm/warn.js");
+/* harmony import */ var _getStateAttributesProps_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./getStateAttributesProps.js */ "./node_modules/@base-ui/react/esm/utils/getStateAttributesProps.js");
+/* harmony import */ var _resolveClassName_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./resolveClassName.js */ "./node_modules/@base-ui/react/esm/utils/resolveClassName.js");
+/* harmony import */ var _resolveStyle_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./resolveStyle.js */ "./node_modules/@base-ui/react/esm/utils/resolveStyle.js");
+/* harmony import */ var _merge_props_index_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../merge-props/index.js */ "./node_modules/@base-ui/react/esm/merge-props/mergeProps.js");
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./constants.js */ "./node_modules/@base-ui/utils/esm/empty.js");
+
 
 
 
@@ -44315,7 +44308,7 @@ function useRenderElement(element, componentProps, params = {}) {
   if (params.enabled === false) {
     return null;
   }
-  const state = params.state ?? _constants_js__WEBPACK_IMPORTED_MODULE_8__.EMPTY_OBJECT;
+  const state = params.state ?? _constants_js__WEBPACK_IMPORTED_MODULE_9__.EMPTY_OBJECT;
   return evaluateRenderProp(element, renderProp, outProps, state);
 }
 
@@ -44329,16 +44322,16 @@ function useRenderElementProps(componentProps, params = {}) {
     render: renderProp
   } = componentProps;
   const {
-    state = _constants_js__WEBPACK_IMPORTED_MODULE_8__.EMPTY_OBJECT,
+    state = _constants_js__WEBPACK_IMPORTED_MODULE_9__.EMPTY_OBJECT,
     ref,
     props,
     stateAttributesMapping,
     enabled = true
   } = params;
-  const className = enabled ? (0,_resolveClassName_js__WEBPACK_IMPORTED_MODULE_5__.resolveClassName)(classNameProp, state) : undefined;
-  const style = enabled ? (0,_resolveStyle_js__WEBPACK_IMPORTED_MODULE_6__.resolveStyle)(styleProp, state) : undefined;
-  const stateProps = enabled ? (0,_getStateAttributesProps_js__WEBPACK_IMPORTED_MODULE_4__.getStateAttributesProps)(state, stateAttributesMapping) : _constants_js__WEBPACK_IMPORTED_MODULE_8__.EMPTY_OBJECT;
-  const outProps = enabled ? (0,_base_ui_utils_mergeObjects__WEBPACK_IMPORTED_MODULE_3__.mergeObjects)(stateProps, Array.isArray(props) ? (0,_merge_props_index_js__WEBPACK_IMPORTED_MODULE_7__.mergePropsN)(props) : props) ?? _constants_js__WEBPACK_IMPORTED_MODULE_8__.EMPTY_OBJECT : _constants_js__WEBPACK_IMPORTED_MODULE_8__.EMPTY_OBJECT;
+  const className = enabled ? (0,_resolveClassName_js__WEBPACK_IMPORTED_MODULE_6__.resolveClassName)(classNameProp, state) : undefined;
+  const style = enabled ? (0,_resolveStyle_js__WEBPACK_IMPORTED_MODULE_7__.resolveStyle)(styleProp, state) : undefined;
+  const stateProps = enabled ? (0,_getStateAttributesProps_js__WEBPACK_IMPORTED_MODULE_5__.getStateAttributesProps)(state, stateAttributesMapping) : _constants_js__WEBPACK_IMPORTED_MODULE_9__.EMPTY_OBJECT;
+  const outProps = enabled ? (0,_base_ui_utils_mergeObjects__WEBPACK_IMPORTED_MODULE_3__.mergeObjects)(stateProps, Array.isArray(props) ? (0,_merge_props_index_js__WEBPACK_IMPORTED_MODULE_8__.mergePropsN)(props) : props) ?? _constants_js__WEBPACK_IMPORTED_MODULE_9__.EMPTY_OBJECT : _constants_js__WEBPACK_IMPORTED_MODULE_9__.EMPTY_OBJECT;
 
   // SAFETY: The `useMergedRefs` functions use a single hook to store the same value,
   // switching between them at runtime is safe. If this assertion fails, React will
@@ -44356,10 +44349,10 @@ function useRenderElementProps(componentProps, params = {}) {
     }
   }
   if (!enabled) {
-    return _constants_js__WEBPACK_IMPORTED_MODULE_8__.EMPTY_OBJECT;
+    return _constants_js__WEBPACK_IMPORTED_MODULE_9__.EMPTY_OBJECT;
   }
   if (className !== undefined) {
-    outProps.className = (0,_merge_props_index_js__WEBPACK_IMPORTED_MODULE_7__.mergeClassNames)(outProps.className, className);
+    outProps.className = (0,_merge_props_index_js__WEBPACK_IMPORTED_MODULE_8__.mergeClassNames)(outProps.className, className);
   }
   if (style !== undefined) {
     outProps.style = (0,_base_ui_utils_mergeObjects__WEBPACK_IMPORTED_MODULE_3__.mergeObjects)(outProps.style, style);
@@ -44375,9 +44368,12 @@ const REACT_LAZY_TYPE = Symbol.for('react.lazy');
 function evaluateRenderProp(element, render, props, state) {
   if (render) {
     if (typeof render === 'function') {
+      if (true) {
+        warnIfRenderPropLooksLikeComponent(render);
+      }
       return render(props, state);
     }
-    const mergedProps = (0,_merge_props_index_js__WEBPACK_IMPORTED_MODULE_7__.mergeProps)(props, render.props);
+    const mergedProps = (0,_merge_props_index_js__WEBPACK_IMPORTED_MODULE_8__.mergeProps)(props, render.props);
     mergedProps.ref = props.ref;
     let newElement = render;
 
@@ -44410,6 +44406,17 @@ function evaluateRenderProp(element, render, props, state) {
   // Unreachable, but the typings on `useRenderElement` need to be reworked
   // to annotate it correctly.
   throw new Error( true ? 'Base UI: Render element or function are not defined.' : 0);
+}
+function warnIfRenderPropLooksLikeComponent(renderFn) {
+  const functionName = renderFn.name;
+  if (functionName.length === 0) {
+    return;
+  }
+  const firstCharacterCode = functionName.charCodeAt(0);
+  if (firstCharacterCode < 65 || firstCharacterCode > 90) {
+    return;
+  }
+  (0,_base_ui_utils_warn__WEBPACK_IMPORTED_MODULE_4__.warn)(`The \`render\` prop received a function named \`${functionName}\` that starts with an uppercase letter.`, 'This usually means a React component was passed directly as `render={Component}`.', 'Base UI calls `render` as a plain function, which can break the Rules of Hooks during reconciliation.', 'If this is an intentional render callback, rename it to start with a lowercase letter.', 'Use `render={<Component />}` or `render={(props) => <Component {...props} />}` instead.', 'https://base-ui.com/r/invalid-render-prop');
 }
 function renderTag(Tag, props) {
   if (Tag === 'button') {
@@ -44684,6 +44691,33 @@ function useRefWithInit(init, initArg) {
     ref.current = init(initArg);
   }
   return ref;
+}
+
+/***/ },
+
+/***/ "./node_modules/@base-ui/utils/esm/warn.js"
+/*!*************************************************!*\
+  !*** ./node_modules/@base-ui/utils/esm/warn.js ***!
+  \*************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   warn: () => (/* binding */ warn)
+/* harmony export */ });
+let set;
+if (true) {
+  set = new Set();
+}
+function warn(...messages) {
+  if (true) {
+    const messageKey = messages.join(' ');
+    if (!set.has(messageKey)) {
+      set.add(messageKey);
+      console.warn(`Base UI: ${messageKey}`);
+    }
+  }
 }
 
 /***/ },

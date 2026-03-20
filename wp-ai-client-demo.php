@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP AI Client Demo
  * Description: A demo plugin to showcase the integration of the WordPress AI Client.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Jonathan Bossenger
  * Plugin URI: https://github.com/jonathanbossenger/wp-ai-client-demo
  *
@@ -39,7 +39,7 @@ add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_client_demo_set_reque
  * @return int
  */
 function wp_ai_client_demo_set_request_timeout() {
-	return 60;
+	return 90;
 }
 
 add_action( 'admin_menu', 'wp_ai_client_demo_register_tools_submenu' );
@@ -82,21 +82,19 @@ function wp_ai_client_demo_admin_enqueue_scripts() {
 		return;
 	}
 
+    wp_enqueue_script( 'wp-ai-client' );
+
     // Should be removed once 7.0 is released.
     wp_enqueue_script_module( '@wordpress/core-abilities' );
+    wp_enqueue_script_module( '@wordpress/abilities' );
 
-	wp_enqueue_script( 'wp-ai-client' );
+    $asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
-	$asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
-    // remove wp-abilities from dependencies see https://github.com/WordPress/gutenberg/issues/75196
-    $dependencies = array_diff( $asset_file['dependencies'], array( 'wp-abilities' ) );
-
-    wp_enqueue_script(
-        'wp-ai-client-demo-scripts',
+    wp_enqueue_script_module(
+        'wp-ai-client-demo-script',
         plugins_url( 'build/index.js', __FILE__ ),
-        $dependencies,
+        array( '@wordpress/abilities' ),
         $asset_file['version'],
-        array( 'in_footer' => true, 'module_dependencies' => array( '@wordpress/abilities' ) ),
     );
 }
 
@@ -180,7 +178,6 @@ function wp_ai_client_demo_generate_post( $arguments ) {
 			'message' => 'Post creation failed: ' . $content->get_error_message(),
 		);
 	}
-
 	$image   = wp_ai_client_demo_create_image( $arguments['title'] );
 	if ( is_wp_error( $image ) ) {
 		return array(
@@ -203,6 +200,7 @@ function wp_ai_client_generate_content( $prompt ) {
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 	try {
+        // gather_posts and pass as context
 		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 	} catch ( Exception $e ) {
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
@@ -217,9 +215,7 @@ function wp_ai_client_generate_content( $prompt ) {
  */
 function wp_ai_client_demo_create_image( $title ) {
 	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '.';
-
     $prompt = \WordPress\AI_Client\AI_Client::prompt( $image_prompt );
-
     if ( ! $prompt->is_supported_for_image_generation() ){
         return null;
     }
