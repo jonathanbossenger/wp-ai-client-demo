@@ -2,7 +2,8 @@
 /**
  * Plugin Name: WP AI Client Demo
  * Description: A demo plugin to showcase the integration of the WordPress AI Client.
- * Version: 1.0.1
+ * Version: 2.0.0
+ * Requires at least: 7.0
  * Author: Jonathan Bossenger
  * Plugin URI: https://github.com/jonathanbossenger/wp-ai-client-demo
  *

@@ -3,6 +3,7 @@
     "description": "A demo plugin to showcase the integration of the WordPress AI SDK.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
+    "version": "2.0.0",
     "authors": [
         {
             "name": "Jonathan Bossenger",
