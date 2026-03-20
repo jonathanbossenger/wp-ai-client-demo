@@ -29083,8 +29083,7 @@ const SettingsPage = () => {
             onChange({
               context: updated
             });
-          },
-          __nextHasNoMarginBottom: true
+          }
         }, element.value))]
       });
     }
@@ -29093,11 +29092,14 @@ const SettingsPage = () => {
     fields: ['title', 'prompt', 'context']
   };
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    async function updateMessage() {
-      const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
+    async function loadInstructionsMessage() {
+      let prompt = '';
+      prompt += 'A simple sentence encouraging the user to create a WordPress Post using AI. ';
+      prompt += 'Only return the actual sentence. Do not include any additional text or formatting.';
+      const text = await wp.aiClient.prompt(prompt).generateText();
       setNoticeMessage(text);
     }
-    updateMessage();
+    loadInstructionsMessage();
   }, []);
   const updateNotice = (message, status = 'info') => {
     setNoticeMessage(message);

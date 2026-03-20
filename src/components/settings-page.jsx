@@ -91,7 +91,6 @@ const SettingsPage = () => {
                                         : selected.filter( ( v ) => v !== element.value );
                                     onChange( { context: updated } );
                                 } }
-                                __nextHasNoMarginBottom
                             />
                         ) ) }
                     </fieldset>
@@ -105,11 +104,14 @@ const SettingsPage = () => {
     };
 
     useEffect( () => {
-        async function updateMessage() {
-            const text = await wp.aiClient.prompt('A simple sentence encouraging the user to create a WordPress Post using AI.').generateText();
+        async function loadInstructionsMessage() {
+            let prompt = '';
+            prompt += 'A simple sentence encouraging the user to create a WordPress Post using AI. ';
+            prompt += 'Only return the actual sentence. Do not include any additional text or formatting.';
+            const text = await wp.aiClient.prompt(prompt).generateText();
             setNoticeMessage( text );
         }
-        updateMessage();
+        loadInstructionsMessage();
     }, [] );
 
     const updateNotice = ( message, status = 'info' ) => {
