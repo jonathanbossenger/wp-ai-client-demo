@@ -28995,20 +28995,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/dataviews/wp */ "./node_modules/@wordpress/dataviews/build-wp/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/core-data */ "@wordpress/core-data");
+/* harmony import */ var _wordpress_core_data__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/dataviews/wp */ "./node_modules/@wordpress/dataviews/build-wp/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
 
 
 
 
+
+
+
+// Uses /* webpackIgnore: true */ to tell webpack to skip bundling this import and leave it as a runtime ES module import.
+// Needed until https://github.com/WordPress/gutenberg/issues/75196 is fixed
 
 const {
   getAbility,
   executeAbility
 } = await import(/* webpackIgnore: true */'@wordpress/abilities');
 const SettingsTitle = () => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHeading, {
     level: 1,
     children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WP AI SDK Demo', 'wp-ai-client-demo')
   });
@@ -29016,8 +29025,8 @@ const SettingsTitle = () => {
 const GenerateButton = ({
   onClick
 }) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
       variant: "primary",
       onClick: onClick,
       __next40pxDefaultSize: true,
@@ -29030,8 +29039,21 @@ const SettingsPage = () => {
   const [noticeMessage, setNoticeMessage] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)('Ready...');
   const [input, setInput] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)({
     title: "",
-    prompt: ""
+    prompt: "",
+    context: []
   });
+  const posts = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => {
+    return select(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_4__.store).getEntityRecords('postType', 'post', {
+      per_page: 25,
+      orderby: 'date',
+      order: 'desc',
+      status: 'publish'
+    });
+  }, []);
+  const postElements = (posts || []).map(post => ({
+    value: post.id,
+    label: post.title.rendered
+  }));
   const fields = [{
     id: 'title',
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Title', 'wp-ai-client-demo'),
@@ -29041,9 +29063,34 @@ const SettingsPage = () => {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Prompt', 'wp-ai-client-demo'),
     type: 'text',
     Edit: 'textarea'
+  }, {
+    id: "context",
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Context (optional), select posts to include', 'wp-ai-client-demo'),
+    Edit: ({
+      data,
+      field,
+      onChange
+    }) => {
+      const selected = data.context || [];
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("fieldset", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("legend", {
+          children: field.label
+        }), postElements.map(element => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {
+          label: element.label,
+          checked: selected.includes(element.value),
+          onChange: isChecked => {
+            const updated = isChecked ? [...selected, element.value] : selected.filter(v => v !== element.value);
+            onChange({
+              context: updated
+            });
+          },
+          __nextHasNoMarginBottom: true
+        }, element.value))]
+      });
+    }
   }];
   const form = {
-    fields: ['title', 'prompt']
+    fields: ['title', 'prompt', 'context']
   };
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     async function updateMessage() {
@@ -29079,17 +29126,17 @@ const SettingsPage = () => {
       updateNotice('Post generation completed!.', 'success');
     }
   }, [input]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
     spacing: 4,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(SettingsTitle, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
       status: noticeStatus,
       children: noticeMessage
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_3__.DataForm, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_dataviews_wp__WEBPACK_IMPORTED_MODULE_5__.DataForm, {
       data: input,
       fields: fields,
       form: form,
       onChange: onChange
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(GenerateButton, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(GenerateButton, {
       onClick: generateFromInput
     })]
   });
@@ -31074,6 +31121,17 @@ module.exports = window["ReactJSXRuntime"];
 
 "use strict";
 module.exports = window["wp"]["components"];
+
+/***/ },
+
+/***/ "@wordpress/core-data"
+/*!**********************************!*\
+  !*** external ["wp","coreData"] ***!
+  \**********************************/
+(module) {
+
+"use strict";
+module.exports = window["wp"]["coreData"];
 
 /***/ },
 

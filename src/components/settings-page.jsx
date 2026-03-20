@@ -5,9 +5,12 @@ import {
     // eslint-disable-next-line @wordpress/no-unsafe-wp-apis
     __experimentalVStack as VStack,
     Button,
+    CheckboxControl,
     Notice
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews/wp';
 
 // Uses /* webpackIgnore: true */ to tell webpack to skip bundling this import and leave it as a runtime ES module import.
@@ -40,7 +43,22 @@ const SettingsPage = () => {
     const [input, setInput] = useState({
         title: "",
         prompt: "",
+        context: [],
     });
+
+    const posts = useSelect( ( select ) => {
+        return select( coreStore ).getEntityRecords( 'postType', 'post', {
+            per_page: 25,
+            orderby: 'date',
+            order: 'desc',
+            status: 'publish',
+        } );
+    }, [] );
+
+    const postElements = ( posts || [] ).map( ( post ) => ( {
+        value: post.id,
+        label: post.title.rendered,
+    } ) );
 
     const fields = [
         {
@@ -53,11 +71,37 @@ const SettingsPage = () => {
             label: __( 'Prompt', 'wp-ai-client-demo' ),
             type: 'text',
             Edit: 'textarea',
+        },
+        {
+            id: "context",
+            label: __( 'Context (optional), select posts to include', 'wp-ai-client-demo' ),
+            Edit: ( { data, field, onChange } ) => {
+                const selected = data.context || [];
+                return (
+                    <fieldset>
+                        <legend>{ field.label }</legend>
+                        { postElements.map( ( element ) => (
+                            <CheckboxControl
+                                key={ element.value }
+                                label={ element.label }
+                                checked={ selected.includes( element.value ) }
+                                onChange={ ( isChecked ) => {
+                                    const updated = isChecked
+                                        ? [ ...selected, element.value ]
+                                        : selected.filter( ( v ) => v !== element.value );
+                                    onChange( { context: updated } );
+                                } }
+                                __nextHasNoMarginBottom
+                            />
+                        ) ) }
+                    </fieldset>
+                );
+            },
         }
     ];
 
     const form = {
-        fields: [ 'title', 'prompt' ],
+        fields: [ 'title', 'prompt', 'context' ],
     };
 
     useEffect( () => {
