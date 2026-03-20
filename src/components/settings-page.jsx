@@ -5,11 +5,17 @@ import {
     // eslint-disable-next-line @wordpress/no-unsafe-wp-apis
     __experimentalVStack as VStack,
     Button,
+    CheckboxControl,
     Notice
 } from '@wordpress/components';
 import { useState, useEffect, useCallback } from "@wordpress/element";
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews/wp';
-import { getAbility, executeAbility } from '@wordpress/abilities';
+
+// Uses /* webpackIgnore: true */ to tell webpack to skip bundling this import and leave it as a runtime ES module import.
+// Needed until https://github.com/WordPress/gutenberg/issues/75196 is fixed
+const { getAbility, executeAbility } = await import( /* webpackIgnore: true */ '@wordpress/abilities' );
 
 const SettingsTitle = () => {
     return (
@@ -37,7 +43,22 @@ const SettingsPage = () => {
     const [input, setInput] = useState({
         title: "",
         prompt: "",
+        context: [],
     });
+
+    const posts = useSelect( ( select ) => {
+        return select( coreStore ).getEntityRecords( 'postType', 'post', {
+            per_page: 25,
+            orderby: 'date',
+            order: 'desc',
+            status: 'publish',
+        } );
+    }, [] );
+
+    const postElements = ( posts || [] ).map( ( post ) => ( {
+        value: post.id,
+        label: post.title.rendered,
+    } ) );
 
     const fields = [
         {
@@ -50,16 +71,47 @@ const SettingsPage = () => {
             label: __( 'Prompt', 'wp-ai-client-demo' ),
             type: 'text',
             Edit: 'textarea',
+        },
+        {
+            id: "context",
+            label: __( 'Context (optional), select posts to include', 'wp-ai-client-demo' ),
+            Edit: ( { data, field, onChange } ) => {
+                const selected = data.context || [];
+                return (
+                    <fieldset>
+                        <legend>{ field.label }</legend>
+                        { postElements.map( ( element ) => (
+                            <CheckboxControl
+                                key={ element.value }
+                                label={ element.label }
+                                checked={ selected.includes( element.value ) }
+                                onChange={ ( isChecked ) => {
+                                    const updated = isChecked
+                                        ? [ ...selected, element.value ]
+                                        : selected.filter( ( v ) => v !== element.value );
+                                    onChange( { context: updated } );
+                                } }
+                            />
+                        ) ) }
+                    </fieldset>
+                );
+            },
         }
     ];
 
     const form = {
-        fields: [ 'title', 'prompt' ],
+        fields: [ 'title', 'prompt', 'context' ],
     };
 
-    useEffect( async () => {
-        const text = await wp.aiClient.prompt('A short sentence encouraging the user to create a WordPress Post using AI.').generateText();
-        setNoticeMessage( text );
+    useEffect( () => {
+        async function loadInstructionsMessage() {
+            let prompt = '';
+            prompt += 'A simple sentence encouraging the user to create a WordPress Post using AI. ';
+            prompt += 'Only return the actual sentence. Do not include any additional text or formatting.';
+            const text = await wp.aiClient.prompt(prompt).generateText();
+            setNoticeMessage( text );
+        }
+        loadInstructionsMessage();
     }, [] );
 
     const updateNotice = ( message, status = 'info' ) => {
@@ -75,14 +127,15 @@ const SettingsPage = () => {
     };
 
     const generateFromInput = useCallback( async () => {
-        const ability = getAbility( 'wp-ai-client-demo/generate-post' );
-        if ( ! ability ) {
+        const generatePostAbility = getAbility( 'wp-ai-client-demo/generate-post' );
+        if ( ! generatePostAbility ) {
             updateNotice('Whoops, post generation Ability not found.', 'error' );
             return;
         }
         try {
             updateNotice('Attempting to execute post generation Ability, please hold for updates...', 'info' );
             const result = await executeAbility( 'wp-ai-client-demo/generate-post', input );
+            console.log(result);
         } catch ( err ) {
             updateNotice('Error during post generation. Check console for details.', 'error' );
             console.error( err );
