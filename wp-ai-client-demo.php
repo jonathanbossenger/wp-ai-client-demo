@@ -39,7 +39,7 @@ add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_client_demo_set_reque
  * @return int
  */
 function wp_ai_client_demo_set_request_timeout() {
-	return 90;
+	return 120;
 }
 
 add_action( 'admin_menu', 'wp_ai_client_demo_register_tools_submenu' );
@@ -171,6 +171,104 @@ function wp_ai_client_demo_register_generate_post_ability() {
 		)
 	);
 }
+add_action( 'wp_abilities_api_init', 'wp_ai_client_demo_register_generate_writing_style_ability' );
+/**
+ * Register an ability to generate writing style instructions from existing posts.
+ *
+ * @return void
+ */
+function wp_ai_client_demo_register_generate_writing_style_ability() {
+	wp_register_ability(
+		'wp-ai-client-demo/generate-writing-style',
+		array(
+			'label'               => __( 'Generate writing style instructions', 'wp-ai-client-demo' ),
+			'description'         => __( 'Analyze selected posts and generate a set of writing style instructions based on their content.', 'wp-ai-client-demo' ),
+			'category'            => 'wp-ai-client-demo',
+			'input_schema'        => array(
+				'type'       => 'object',
+				'properties' => array(
+					'post_ids' => array(
+						'type'        => 'array',
+						'description' => 'List of post IDs to analyze for writing style.',
+						'items'       => array(
+							'type' => 'integer',
+						),
+					),
+				),
+				'required'   => array( 'post_ids' ),
+			),
+			'output_schema'       => array(
+				'type'       => 'object',
+				'properties' => array(
+					'instructions' => array(
+						'type'        => 'string',
+						'description' => 'The generated writing style instructions.',
+					),
+				),
+				'required'   => array( 'instructions' ),
+			),
+			'execute_callback'    => 'wp_ai_client_demo_generate_writing_style',
+			'permission_callback' => function () {
+				return current_user_can( 'edit_posts' );
+			},
+			'meta'                => array(
+				'show_in_rest' => true,
+			),
+		)
+	);
+}
+/**
+ * Generate writing style instructions based on the content of selected posts.
+ *
+ * @param array $arguments The arguments containing post_ids.
+ *
+ * @return array
+ */
+function wp_ai_client_demo_generate_writing_style( $arguments ) {
+	$post_ids = $arguments['post_ids'] ?? array();
+
+	if ( empty( $post_ids ) ) {
+		return array(
+			'instructions' => '',
+		);
+	}
+
+	$post_contents = array();
+	foreach ( $post_ids as $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			continue;
+		}
+		$text = wp_strip_all_tags( $post->post_content );
+		$text = trim( $text );
+		if ( ! empty( $text ) ) {
+			$post_contents[] = $text;
+		}
+	}
+
+	if ( empty( $post_contents ) ) {
+		return array(
+			'instructions' => '',
+		);
+	}
+
+	$combined_content = implode( "\n\n---\n\n", $post_contents );
+
+	$prompt = "Analyze the following blog posts and generate a concise set of writing style instructions that capture the author's tone, voice, sentence structure, vocabulary level, and any recurring stylistic patterns. The instructions should be usable as a guide for writing new content in the same style.\n\n" . $combined_content;
+
+	try {
+		$instructions = \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
+	} catch ( Exception $e ) {
+		return array(
+			'instructions' => 'Failed to generate writing style: ' . $e->getMessage(),
+		);
+	}
+
+	return array(
+		'instructions' => $instructions,
+	);
+}
+
 /**
  * Generate a WordPress post using AI based on the provided title and prompt.
  *
@@ -208,10 +306,23 @@ function wp_ai_client_generate_content( $prompt, $context_post_ids = array() ) {
 		$prompt .= '.';
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
+
+	if ( ! empty( $context_post_ids ) ) {
+		$ability = wp_get_ability( 'wp-ai-client-demo/generate-writing-style' );
+		if ( $ability ) {
+			$result = $ability->execute( array( 'post_ids' => $context_post_ids ) );
+			if ( ! is_wp_error( $result ) && ! empty( $result['instructions'] ) ) {
+				$prompt .= "\n\nUse the following writing style instructions when generating the content:\n" . $result['instructions'];
+			}
+		}
+	}
+
+    error_log($prompt);
+
 	try {
-        // gather_posts and pass as context
 		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
 	} catch ( Exception $e ) {
+        error_log( $e );
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
 	}
 }
