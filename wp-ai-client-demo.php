@@ -134,9 +134,16 @@ function wp_ai_client_demo_register_generate_post_ability() {
 						'type'        => 'string',
 						'description' => 'The title of the post to be generated.',
 					),
-					'prompt' => array(
+					'prompt'  => array(
 						'type'        => 'string',
 						'description' => 'The prompt to guide the post generation.',
+					),
+					'context' => array(
+						'type'        => 'array',
+						'description' => 'Optional list of post IDs to use as context for generation.',
+						'items'       => array(
+							'type' => 'integer',
+						),
 					),
 				),
 			),
@@ -172,7 +179,8 @@ function wp_ai_client_demo_register_generate_post_ability() {
  * @return array
  */
 function wp_ai_client_demo_generate_post( $arguments ) {
-	$content = wp_ai_client_generate_content( $arguments['prompt'] );
+	$context_post_ids = $arguments['context'] ?? array();
+	$content          = wp_ai_client_generate_content( $arguments['prompt'], $context_post_ids );
 	if ( is_wp_error( $content ) ) {
 		return array(
 			'message' => 'Post creation failed: ' . $content->get_error_message(),
@@ -189,11 +197,12 @@ function wp_ai_client_demo_generate_post( $arguments ) {
 /**
  * Generate content using the AI Client based on the provided prompt.
  *
- * @param string $prompt The prompt to guide content generation.
+ * @param string $prompt           The prompt to guide content generation.
+ * @param array  $context_post_ids Optional list of post IDs to use as context.
  *
  * @return mixed
  */
-function wp_ai_client_generate_content( $prompt ) {
+function wp_ai_client_generate_content( $prompt, $context_post_ids = array() ) {
 	$prompt = rtrim( $prompt );
 	if ( ! str_ends_with( $prompt, '.' ) ) {
 		$prompt .= '.';
