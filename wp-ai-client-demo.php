@@ -35,6 +35,7 @@ add_action( 'admin_enqueue_scripts', 'wp_ai_client_demo_admin_enqueue_scripts' )
 add_action( 'wp_abilities_api_categories_init', 'wp_ai_client_demo_register_ability_categories' );
 add_action( 'wp_abilities_api_init', 'wp_ai_client_demo_register_generate_post_ability' );
 add_action( 'wp_abilities_api_init', 'wp_ai_client_demo_register_generate_writing_style_ability' );
+add_action( 'wp_abilities_api_init', 'wp_ai_client_demo_register_get_writing_style_ability' );
 
 // Filters
 add_filter( 'wp_ai_client_default_request_timeout', 'wp_ai_client_demo_set_request_timeout' );

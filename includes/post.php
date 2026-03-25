@@ -18,8 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 function wp_ai_client_demo_generate_post( $arguments ) {
-	$context_post_ids = $arguments['context'] ?? array();
-	$content          = wp_ai_client_generate_content( $arguments['prompt'], $context_post_ids );
+	$content = wp_ai_client_generate_content( $arguments['prompt'] );
 	if ( is_wp_error( $content ) ) {
 		return array(
 			'message' => 'Post creation failed: ' . $content->get_error_message(),
