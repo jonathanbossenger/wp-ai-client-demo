@@ -13,40 +13,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Generate content using the AI Client based on the provided prompt.
  *
- * @param string $prompt           The prompt to guide content generation.
- * @param array  $context_post_ids Optional list of post IDs to use as context.
+ * Uses the `using_abilities` method on the prompt builder so the AI model
+ * can call the `get-writing-style` ability to fetch saved writing style instructions.
+ *
+ * @param string $prompt The prompt to guide content generation.
  *
  * @return mixed
  */
-function wp_ai_client_generate_content( $prompt, $context_post_ids = array() ) {
+function wp_ai_client_generate_content( $prompt ) {
 	$prompt = rtrim( $prompt );
 	if ( ! str_ends_with( $prompt, '.' ) ) {
 		$prompt .= '.';
 	}
 	$prompt .= ' Make sure the response uses WordPress Block Editor markup.';
 
-	if ( ! empty( $context_post_ids ) ) {
-		$ability = wp_get_ability( 'wp-ai-client-demo/generate-writing-style' );
-		if ( $ability ) {
-			$result = $ability->execute( array( 'post_ids' => $context_post_ids ) );
-			if ( ! is_wp_error( $result ) && ! empty( $result['instructions'] ) ) {
-				$prompt .= "\n\nUse the following writing style instructions when generating the content:\n" . $result['instructions'];
-			}
-		}
-	}
-
-    error_log($prompt);
+	error_log( $prompt );
 
 	try {
-		return \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
+		return \WordPress\AI_Client\AI_Client::prompt( $prompt )
+			->using_abilities()
+			->generate_text();
 	} catch ( Exception $e ) {
-        error_log( $e );
+		error_log( $e );
 		return new WP_Error( 'content_creation_error', 'Error message', $e->getMessage() );
 	}
 }
 
 /**
- * Generate writing style instructions based on the content of selected posts.
+ * Generate writing style instructions based on the content of selected posts
+ * and save them to the options table.
  *
  * @param array $arguments The arguments containing post_ids.
  *
@@ -91,6 +86,21 @@ function wp_ai_client_demo_generate_writing_style( $arguments ) {
 			'instructions' => 'Failed to generate writing style: ' . $e->getMessage(),
 		);
 	}
+
+	update_option( 'wp_ai_client_demo_writing_style', $instructions );
+
+	return array(
+		'instructions' => $instructions,
+	);
+}
+
+/**
+ * Get the saved writing style instructions from the options table.
+ *
+ * @return array
+ */
+function wp_ai_client_demo_get_writing_style() {
+	$instructions = get_option( 'wp_ai_client_demo_writing_style', '' );
 
 	return array(
 		'instructions' => $instructions,

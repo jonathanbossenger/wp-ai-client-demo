@@ -26,7 +26,7 @@ function wp_ai_client_demo_register_ability_categories() {
 }
 
 /**
- * Register a custom ability to get site information.
+ * Register a custom ability to generate a post via AI.
  *
  * @return void
  */
@@ -47,13 +47,6 @@ function wp_ai_client_demo_register_generate_post_ability() {
 					'prompt'  => array(
 						'type'        => 'string',
 						'description' => 'The prompt to guide the post generation.',
-					),
-					'context' => array(
-						'type'        => 'array',
-						'description' => 'Optional list of post IDs to use as context for generation.',
-						'items'       => array(
-							'type' => 'integer',
-						),
 					),
 				),
 			),
@@ -118,6 +111,43 @@ function wp_ai_client_demo_register_generate_writing_style_ability() {
 				'required'   => array( 'instructions' ),
 			),
 			'execute_callback'    => 'wp_ai_client_demo_generate_writing_style',
+			'permission_callback' => function () {
+				return current_user_can( 'edit_posts' );
+			},
+			'meta'                => array(
+				'show_in_rest' => true,
+			),
+		)
+	);
+}
+
+/**
+ * Register an ability to get the saved writing style instructions.
+ *
+ * @return void
+ */
+function wp_ai_client_demo_register_get_writing_style_ability() {
+	wp_register_ability(
+		'wp-ai-client-demo/get-writing-style',
+		array(
+			'label'               => __( 'Get writing style instructions', 'wp-ai-client-demo' ),
+			'description'         => __( 'Retrieve the saved writing style instructions to guide content generation.', 'wp-ai-client-demo' ),
+			'category'            => 'wp-ai-client-demo',
+			'input_schema'        => array(
+				'type'       => 'object',
+				'properties' => array(),
+			),
+			'output_schema'       => array(
+				'type'       => 'object',
+				'properties' => array(
+					'instructions' => array(
+						'type'        => 'string',
+						'description' => 'The saved writing style instructions.',
+					),
+				),
+				'required'   => array( 'instructions' ),
+			),
+			'execute_callback'    => 'wp_ai_client_demo_get_writing_style',
 			'permission_callback' => function () {
 				return current_user_can( 'edit_posts' );
 			},

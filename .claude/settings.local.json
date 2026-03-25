@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(find /Users/jonathanbossenger/Studio/wordpress/wp-content/plugins/wp-ai-client-demo -not -path */node_modules/* -not -path */.git/* -type f)",
+      "Bash(grep -E \"\\(webpack|config|tsconfig|\\\\.js$|\\\\.config\\)\")",
+      "Bash(grep:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

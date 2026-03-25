@@ -62,4 +62,11 @@ function wp_ai_client_demo_admin_enqueue_scripts() {
         array( '@wordpress/abilities' ),
         $asset_file['version'],
     );
+
+    wp_enqueue_style(
+        'wp-ai-client-demo-style',
+        plugins_url( 'build/style-index.css', __DIR__ ),
+        array(),
+        $asset_file['version'],
+    );
 }
