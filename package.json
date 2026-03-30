@@ -1,7 +1,7 @@
 {
   "name": "wp-ai-sdk-demo",
   "version": "2.0.0",
-  "description": "WP AI SDK Demo plugin",
+  "description": "WP AI Client Demo plugin",
   "homepage": "https://github.com/jonathanbossenger/wp-ai-sdk-demo#readme",
   "bugs": {
     "url": "https://github.com/jonathanbossenger/wp-ai-sdk-demo/issues"

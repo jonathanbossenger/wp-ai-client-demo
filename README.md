@@ -53,7 +53,7 @@ WP AI Client Demo provides a practical example of integrating AI capabilities in
 
 Access the demo tools page from the WordPress admin:
 
-1. Navigate to **Tools > WP AI SDK Demo** in your WordPress admin
+1. Navigate to **Tools > WP AI Client Demo** in your WordPress admin
 2. Use the interface to test AI capabilities
 
 ## License

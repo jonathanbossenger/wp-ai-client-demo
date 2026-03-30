@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-WordPress admin plugin demonstrating AI integration via the `wordpress/wp-ai-client` Composer package. Registers WordPress Abilities (server-side callable actions) and provides a React-based admin UI under Tools > WP AI SDK Demo.
+WordPress admin plugin demonstrating AI integration via the `wordpress/wp-ai-client` Composer package. Registers WordPress Abilities (server-side callable actions) and provides a React-based admin UI under Tools > WP AI Client Demo.
 
 ## Build Commands
 

@@ -11,15 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Register the WP AI SDK Demo Tools submenu page.
+ * Register the WP AI Client Demo Tools submenu page.
  *
  * @return void
  */
 function wp_ai_client_demo_register_tools_submenu() {
 	add_submenu_page(
 		'tools.php',
-		'WP AI SDK Demo',
-		'WP AI SDK Demo',
+		'WP AI Client Demo',
+		'WP AI Client Demo',
 		'manage_options',
 		'wp-ai-client-demo-tools',
 		'wp_ai_client_demo_tools_page_callback'
@@ -27,7 +27,7 @@ function wp_ai_client_demo_register_tools_submenu() {
 }
 
 /**
- * Render the WP AI SDK Demo Tools page.
+ * Render the WP AI client Demo Tools page.
  *
  * @return void
  */

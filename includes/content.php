@@ -77,7 +77,7 @@ function wp_ai_client_demo_generate_writing_style( $arguments ) {
 
 	$combined_content = implode( "\n\n---\n\n", $post_contents );
 
-	$prompt = "Analyze the following blog posts and generate a concise set of writing style instructions that capture the author's tone, voice, sentence structure, vocabulary level, and any recurring stylistic patterns. The instructions should be usable as a guide for writing new content in the same style.\n\n" . $combined_content;
+	$prompt = "Analyze the following blog posts and generate a concise set of writing style instructions that capture the author's tone, voice, sentence structure, vocabulary level, and any recurring stylistic patterns. The instructions should be usable as a guide for writing new content in the same style. Only generate the instructions. \n\n" . $combined_content;
 
 	try {
 		$instructions = \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();

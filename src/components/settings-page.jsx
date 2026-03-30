@@ -21,7 +21,7 @@ const { getAbility, executeAbility } = await import( /* webpackIgnore: true */ '
 const SettingsTitle = () => {
     return (
         <Heading level={ 1 }>
-            { __( 'WP AI SDK Demo', 'wp-ai-client-demo' ) }
+            { __( 'WP AI Client Demo', 'wp-ai-client-demo' ) }
         </Heading>
     );
 };
@@ -66,6 +66,11 @@ const SettingsPage = () => {
             status: 'publish',
         } );
     }, [] );
+
+    const writingStyleAbility = useSelect(
+        ( select ) => select( 'core/abilities' ).getAbility( 'wp-ai-client-demo/get-writing-style' ),
+        []
+    );
 
     const postElements = ( posts || [] ).map( ( post ) => ( {
         value: post.id,
@@ -140,14 +145,15 @@ const SettingsPage = () => {
         }
         loadInstructionsMessage();
 
+    }, [] );
+
+    useEffect( () => {
+        if ( ! writingStyleAbility ) {
+            return;
+        }
         async function loadWritingStyle() {
-            const ability = getAbility( 'wp-ai-client-demo/get-writing-style' );
-            if ( ! ability ) {
-                console.error( 'Ability get-writing-style not available.' );
-                return;
-            }
             try {
-                const result = await executeAbility( 'wp-ai-client-demo/get-writing-style', {} );
+                const result = await executeAbility( 'wp-ai-client-demo/get-writing-style');
                 if ( result?.instructions ) {
                     setInput( ( current ) => ( {
                         ...current,
@@ -159,7 +165,7 @@ const SettingsPage = () => {
             }
         }
         loadWritingStyle();
-    }, [] );
+    }, [ writingStyleAbility ] );
 
     const updateNotice = ( message, status = 'info' ) => {
         setNoticeMessage( message );

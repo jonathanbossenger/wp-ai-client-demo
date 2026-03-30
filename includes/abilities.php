@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Register custom ability categories for the WP AI SDK Demo plugin.
+ * Register custom ability categories for the WP AI Client Demo plugin.
  *
  * @return void
  */
@@ -19,8 +19,8 @@ function wp_ai_client_demo_register_ability_categories() {
 	wp_register_ability_category(
 		'wp-ai-client-demo',
 		array(
-			'label'       => __( 'WP AI SDK Demo', 'wp-ai-client-demo' ),
-			'description' => __( 'Abilities for the WP AI SDK Demo.', 'wp-ai-client-demo' ),
+			'label'       => __( 'WP AI Client Demo', 'wp-ai-client-demo' ),
+			'description' => __( 'Abilities for the WP AI Client Demo.', 'wp-ai-client-demo' ),
 		)
 	);
 }
@@ -133,10 +133,6 @@ function wp_ai_client_demo_register_get_writing_style_ability() {
 			'label'               => __( 'Get writing style instructions', 'wp-ai-client-demo' ),
 			'description'         => __( 'Retrieve the saved writing style instructions to guide content generation.', 'wp-ai-client-demo' ),
 			'category'            => 'wp-ai-client-demo',
-			'input_schema'        => array(
-				'type'       => 'object',
-				'properties' => array(),
-			),
 			'output_schema'       => array(
 				'type'       => 'object',
 				'properties' => array(
