@@ -13,9 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Generate content using the AI Client based on the provided prompt.
  *
- * Uses the `using_abilities` method on the prompt builder so the AI model
- * can call the `get-writing-style` ability to fetch saved writing style instructions.
- *
  * @param string $prompt The prompt to guide content generation.
  *
  * @return mixed
@@ -39,70 +36,3 @@ function wp_ai_client_generate_content( $prompt ) {
 	}
 }
 
-/**
- * Generate writing style instructions based on the content of selected posts
- * and save them to the options table.
- *
- * @param array $arguments The arguments containing post_ids.
- *
- * @return array
- */
-function wp_ai_client_demo_generate_writing_style( $arguments ) {
-	$post_ids = $arguments['post_ids'] ?? array();
-
-	if ( empty( $post_ids ) ) {
-		return array(
-			'instructions' => '',
-		);
-	}
-
-	$post_contents = array();
-	foreach ( $post_ids as $post_id ) {
-		$post = get_post( $post_id );
-		if ( ! $post || 'publish' !== $post->post_status ) {
-			continue;
-		}
-		$text = wp_strip_all_tags( $post->post_content );
-		$text = trim( $text );
-		if ( ! empty( $text ) ) {
-			$post_contents[] = $text;
-		}
-	}
-
-	if ( empty( $post_contents ) ) {
-		return array(
-			'instructions' => '',
-		);
-	}
-
-	$combined_content = implode( "\n\n---\n\n", $post_contents );
-
-	$prompt = "Analyze the following blog posts and generate a concise set of writing style instructions that capture the author's tone, voice, sentence structure, vocabulary level, and any recurring stylistic patterns. The instructions should be usable as a guide for writing new content in the same style. Only generate the instructions. \n\n" . $combined_content;
-
-	try {
-		$instructions = \WordPress\AI_Client\AI_Client::prompt( $prompt )->generate_text();
-	} catch ( Exception $e ) {
-		return array(
-			'instructions' => 'Failed to generate writing style: ' . $e->getMessage(),
-		);
-	}
-
-	update_option( 'wp_ai_client_demo_writing_style', $instructions );
-
-	return array(
-		'instructions' => $instructions,
-	);
-}
-
-/**
- * Get the saved writing style instructions from the options table.
- *
- * @return array
- */
-function wp_ai_client_demo_get_writing_style() {
-	$instructions = get_option( 'wp_ai_client_demo_writing_style', '' );
-
-	return array(
-		'instructions' => $instructions,
-	);
-}

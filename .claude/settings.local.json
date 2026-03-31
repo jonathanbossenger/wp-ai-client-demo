@@ -6,7 +6,11 @@
       "Bash(find /Users/jonathanbossenger/Studio/wordpress/wp-content/plugins/wp-ai-client-demo -not -path */node_modules/* -not -path */.git/* -type f)",
       "Bash(grep -E \"\\(webpack|config|tsconfig|\\\\.js$|\\\\.config\\)\")",
       "Bash(grep:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find /home/jonathan/development/websites/wordpress/wp-content/plugins/wp-ai-client-demo -not -path */vendor/* -type f)",
+      "Bash(cp -r /home/jonathan/development/websites/wordpress/wp-content/plugins/wp-ai-client-demo /home/jonathan/development/websites/wordpress/wp-content/plugins/writing-style-post-generator)",
+      "Bash(mv /home/jonathan/development/websites/wordpress/wp-content/plugins/writing-style-post-generator/wp-ai-client-demo.php /home/jonathan/development/websites/wordpress/wp-content/plugins/writing-style-post-generator/writing-style-post-generator.php)",
+      "Read(//home/jonathan/development/websites/wordpress/wp-content/plugins/**)"
     ]
   }
 }
