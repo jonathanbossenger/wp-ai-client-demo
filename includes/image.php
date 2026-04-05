@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return mixed
  */
 function wp_ai_client_demo_create_image( $title ) {
-	$image_prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '.';
-    $prompt = \WordPress\AI_Client\AI_Client::prompt( $image_prompt );
-    if ( ! $prompt->is_supported_for_image_generation() ){
+	$prompt = 'Create a relevant featured image for a blog post with the following title: ' . $title . '.';
+	$image_builder = wp_ai_client_prompt( $prompt );
+    if ( ! $image_builder->is_supported_for_image_generation() ){
         return null;
     }
     try {
-        return $prompt->generate_image();
+        return $image_builder->generate_image();
     }catch ( Exception $e ) {
         return new WP_Error( 'image_creation_error', 'Error message', $e->getMessage() );
     }
